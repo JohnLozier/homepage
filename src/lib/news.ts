@@ -1,11 +1,14 @@
 import Axios from "axios";
 import DayJS from "dayjs";
+import { News } from "../types/news";
 
 export const getNews = () => {
 	if (!localStorage.getItem("news") || DayJS().diff(JSON.parse(localStorage.getItem("news") as string).timeStamp as number, "minutes") >= 3) {
-		Axios("https://newsdata.io/api/1/latest", {
+		return Axios<{
+			results: News[]
+		}>("https://newsdata.io/api/1/latest", {
 			params: {
-				apiKey: import.meta.env.VITE_NEWS_DATA_API_KEY,
+				apikey: import.meta.env.VITE_NEWS_DATA_API_KEY,
 				country: "us",
 				category: "top",
 				size: 3,
@@ -17,26 +20,15 @@ export const getNews = () => {
 					"washingtontimes"
 				].join(",")
 			}
-		}).then(({ data }) =>
+		}).then(({ data }) => {
 			localStorage.setItem("news", JSON.stringify({
 				timeStamp: Date.now(),
-				data:
-					// ...new Set(data.results.map(({ title, description, pubDate }: {
-					// 	title: string,
-					// 	description: string,
-					// 	pubDate: string
-					// }) => ({
-					// 	title: title,
-					// 	description: description,
-					// 	publishDate: DayJS(pubDate).format("dddd, MMM D, YYYY [at] h:mm a")
-					// })))
-					data.results.map(({ description }: {
-						description: string,
-						title: string,
-						pubDate: string
-					}) => `"${ description }"`).join(",")
-			})));
-	};
+				data: data.results
+			}));
 
-	return JSON.parse(localStorage.getItem("news") as string)?.data;
+			return data.results;
+		});
+	} else {
+		return JSON.parse(localStorage.getItem("news") as string)?.data as News[];
+	};
 };

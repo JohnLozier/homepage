@@ -1,4 +1,4 @@
-import { createSignal, type Accessor, type Setter } from "solid-js";
+import { createEffect, createSignal, type Accessor, type Setter } from "solid-js";
 
 import type { ChatSession } from "@google/generative-ai";
 import { FiSend } from "solid-icons/fi";
@@ -8,6 +8,7 @@ import parseMarkdown from "../../lib/parseMarkdown";
 const Input = (props: {
 	setConversation: Setter<MessageType[]>;
 	conversation: Accessor<MessageType[]>;
+	showSidebar: Accessor<boolean>;
 	messageContainer: HTMLDivElement;
 	geminiContainer: HTMLDivElement;
 	Gemini: () => ChatSession;
@@ -21,6 +22,10 @@ const Input = (props: {
 		input.style.height = "auto";
 		input.style.height = Math.ceil(input.scrollHeight / 24) * 1.5 + "rem";
 	};
+
+	createEffect(() =>
+		props.showSidebar() && input.focus()
+	);
 
 	const sendMessage = async () => {
 		setLocked(true);

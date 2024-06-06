@@ -1,10 +1,10 @@
 import { BACKUP_GREETING, PROMPT } from "../../env";
 import { For, createResource } from "solid-js";
 import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, StartChatParams }from "@google/generative-ai";
+import { getMatches, getSoccerNews } from "../lib/soccer";
 
 import DayJS from "dayjs";
 import { getNews } from "../lib/news";
-import { getSoccerNews } from "../lib/soccer";
 
 const model = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY).getGenerativeModel({
 	model: "gemini-1.5-flash",
@@ -23,7 +23,7 @@ const greetings: Record<string, string> = {
 
 const chatConfig: StartChatParams = {
 	generationConfig: {
-		temperature: 0.8,
+		temperature: 0.4,
 		topP: 0.9,
 		responseMimeType: "text/plain"
 	},
@@ -58,10 +58,19 @@ const Greeting = () => {
 					text: PROMPT
 				},
 				{
-					text: `Here is a list of current news: ${ getNews() || "No news available" }`
+					text: `Here is a list of current news: ${ JSON.parse(localStorage.getItem("news") as string)?.data?.map(({ description }: {
+						description: string,
+						title: string,
+						pubDate: string
+					}) => `"${ description }"`).join(",") || "Could not fetch news" }`
 				},
 				{
-					text: `Here is a list of some current soccer news: ${ getSoccerNews() || "No soccer news available" }`
+					text: `Here is a list of some live soccer scores: ${ getMatches()?.map(({ teams, time, league } ) => `"${ teams.home.name }" ${ teams.home.goals } - ${ teams.away.goals } "${ teams.away.name }" in a ${ league } match at ${ time } minutes`).join(", ") || "Could not fetch soccer games" }`
+				},
+				{
+					text: `Here is a list of some current soccer news: ${ JSON.parse(localStorage.getItem("soccerNews") as string)?.data?.map(({ title }: {
+						title: string
+					}) => `"${ title.replace(/[^\x00-\x7F]/g, "") }"`).join(",") || "Could not fetch soccer news" }`
 				}
 			])
 			.then(res => res.response.text())
@@ -74,7 +83,7 @@ const Greeting = () => {
 		<For each={ (generateInitialGreeting() ?? greetings[Object.keys(greetings).find(hour => parseInt(hour) >= DayJS().hour()) as keyof typeof greetings ?? 24] + BACKUP_GREETING).split(" ") }>
 			{ (char, index) =>
 				<span style={ {
-					"animation-delay": `${ index() * 0.2 }s`
+					"animation-delay": `${ index() * 0.1 }s`
 				} }>{ char } </span>
 			}
 		</For>

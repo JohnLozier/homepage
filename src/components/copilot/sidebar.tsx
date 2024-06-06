@@ -135,7 +135,7 @@ const Sidebar = (props: {
 					history: []
 				});
 			} } />
-			<Input geminiContainer={ liveResponse! } setConversation={ setConversation } conversation={ conversation } messageContainer={ messageContainer! } Gemini={ () => Gemini } />
+			<Input showSidebar={ props.showSidebar } geminiContainer={ liveResponse! } setConversation={ setConversation } conversation={ conversation } messageContainer={ messageContainer! } Gemini={ () => Gemini } />
 			<line onMouseDown={ () => {
 				mouseDown = true;
 				(container.children[0] as HTMLDivElement).style.transitionProperty = "margin,opacity";

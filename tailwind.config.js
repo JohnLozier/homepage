@@ -11,6 +11,7 @@ export default {
 			},
 			animation: {
 				"fadeIn": "fadeIn 1s ease-out forwards",
+				"fadeInUp": "fadeInUp 1s ease-out forwards",
 				"grow": "grow 0.7s ease-out"
 			},
 			keyframes: {
@@ -21,6 +22,18 @@ export default {
 					},
 					"100%": {
 						opacity: 1,
+						filter: "blur(0)"
+					}
+				},
+				"fadeInUp": {
+					"0%": {
+						opacity: 0,
+						transform: "translateY(6rem)",
+						filter: "blur(5px)"
+					},
+					"100%": {
+						opacity: 1,
+						transform: "translateY(0rem)",
 						filter: "blur(0)"
 					}
 				},

@@ -24,7 +24,7 @@ const Background = (props: {
 
 	const [ rgb, setRGB ] = createSignal([
 		rand,
-		(rand + 50) % 360
+		(rand + 75) % 360
 	]);
 
 	const [ image, { refetch } ] = createResource(props.type, async (type) => {
@@ -49,14 +49,14 @@ const Background = (props: {
 		case "gradient":
 			setRGB([
 				newRand,
-				(newRand + 50) % 360
+				(newRand + 75) % 360
 			]);
 
 			break;
 		case "animated":
 			setRGB([
 				newRand,
-				(newRand + 50) % 360
+				(newRand + 75) % 360
 			]);
 
 			const interval = setInterval(() => {
@@ -97,9 +97,9 @@ const Background = (props: {
 
 			const url = await YoutubePlayer.getVideoUrl();
 
-			const indexOfPrevious = youtubeUrls.findIndex(id => id.includes(url.replace(/^(.*v=|.*(?!v=))/, "")));
+			const indexOfPrevious = youtubeUrls.findIndex(id => id.replace(/\?.*/, "") == url.replace(/^(.*v=|.*(?!v=))/, ""));
 
-			const videoID = youtubeUrls[((indexOfPrevious >= 0 ? indexOfPrevious : Math.random() * youtubeUrls.length | 0) + 1) % youtubeUrls.length].split("?");
+			const videoID = youtubeUrls[((indexOfPrevious >= 0 ? indexOfPrevious : (Math.random() * youtubeUrls.length) | 0) + 1) % youtubeUrls.length].split("?");
 
 			await YoutubePlayer.loadVideoById(videoID[0], parseInt(videoID[1] || "0"));
 			await YoutubePlayer.playVideo();
@@ -130,7 +130,7 @@ const Background = (props: {
 		</Match>
 		<Match when={ props.type() == "image" }>
 			<div class="w-full h-full absolute bg-black -z-10">
-				<img onLoad={ async ({ target }) => {
+				<img draggable="false" onLoad={ async ({ target }) => {
 					(target as HTMLImageElement).style.opacity = "1";
 					(target as HTMLImageElement).style.filter = "blur(0px)";
 
@@ -143,7 +143,7 @@ const Background = (props: {
 					});
 					set("unsplash", "images", "image", await data);
 
-				} } class="w-full h-full object-cover transition-[opacity,filter] opacity-0 blur-sm duration-1000" src={ image?.() } />
+				} } class="w-full h-full select-none object-cover transition-[opacity,filter] opacity-0 blur-sm duration-1000" src={ image?.() } />
 			</div>
 		</Match>
 	</Switch>

@@ -8,6 +8,7 @@ import DayJS from "dayjs";
 import Greeting from "./components/greeting";
 import Lozier from "./components/lozier";
 import News from "./components/news/news";
+import Scores from "./components/scores/scores";
 import Search from "./components/search";
 import Weather from "./components/weather";
 import { createSignal } from "solid-js";
@@ -33,7 +34,7 @@ const App = () => {
 	return <div class="w-full h-full">
 		<Background type={ backgroundType } />
 		<Copilot light={ backgroundType() == "live" } />
-		<div class="flex w-full gap-10 pr-10 pt-5 items-end flex-col">
+		<div class="flex gap-10 w-min right-10 top-5 absolute bottom-5 items-end flex-col">
 			<Clock />
 			<Crypto />
 			<Weather />
@@ -43,6 +44,7 @@ const App = () => {
 			<Search light={ backgroundType() == "live" } />
 			<News light={ backgroundType() == "live" } />
 		</div>
+		<Scores />
 		<Lozier onClick={ ({ shiftKey }) => setBackgroudType(current =>
 			shiftKey ? current : backgroundOptions[(backgroundOptions.indexOf(current) + 1) % backgroundOptions.length]
 		)} />

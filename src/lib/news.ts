@@ -11,11 +11,9 @@ export const getNews = () => {
 				apikey: import.meta.env.VITE_NEWS_DATA_API_KEY,
 				country: "us",
 				category: "top",
-				size: 3,
 				domain: [
 					"nytimes",
 					"cnn",
-					"abcnews",
 					"nbcnews",
 					"washingtontimes"
 				].join(",")

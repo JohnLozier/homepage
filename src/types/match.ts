@@ -99,7 +99,7 @@ export interface Match {
 		};
 		"assist": {
 			"id": number | null;
-			"name": number | null;
+			"name": string | null;
 		};
 		"type": string;
 		"detail": string;

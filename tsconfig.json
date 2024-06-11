@@ -12,7 +12,8 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"types": [
-			"vite/client"
+			"vite/client",
+			"vite-plugin-solid-svg/types"
 		]
 	}
 }

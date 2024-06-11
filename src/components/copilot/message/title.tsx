@@ -1,4 +1,4 @@
-import GeminiLogo from "../../../assets/gemini.svg";
+import GeminiLogo from "../../../assets/gemini.svg?component-solid";
 import { TbUserCircle } from "solid-icons/tb";
 
 const Title = ({ from, showAnimation }: {
@@ -7,7 +7,7 @@ const Title = ({ from, showAnimation }: {
 }) => {
 	return <div class="flex flex-row items-center gap-x-2">
 		{
-			from == "user" ? <TbUserCircle stroke-width={ 2.5 } class="text-white/80 animate-fadeIn h-6 w-6" /> : <img class={ `text-white/80 w-6 h-6 ${ showAnimation ? "animate-fadeIn" : "" }` } src={ GeminiLogo } />
+			from == "user" ? <TbUserCircle stroke-width={ 2.5 } class="text-white/80 animate-fadeIn h-6 w-6" /> : <GeminiLogo fill="#f5ffffcc" viewBox="0 0 28 28" class={ `w-6 h-6 ${ showAnimation ? "animate-fadeIn" : "" }` } />
 		}
 		<h3 style={{
 			animation: from == "user" || showAnimation ? "fadeIn 1s ease-out forwards" : undefined

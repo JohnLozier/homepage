@@ -23,35 +23,44 @@ export const getMatches = () => {
 			},
 			time: fixture.status.elapsed,
 			league: league.name,
-			events: events.filter(({ type }) => type != "subst").map(({ type, team, player, assist, time }) => ({
+			events: (events.length > 2 ? events.filter(({ type }) => type != "subst") : events).map(({ type, team, player, assist, time, detail }) => ({
 				time: `${ time.elapsed }${ time.extra ? "+" + time.extra : "" }`,
 				player: player.name,
 				assist: assist.name,
-				team: team.id,
+				detail: detail,
+				team: {
+					name: team.name,
+					id: team.id
+				},
 				type: type
 			}))
 		}))
 
 	if (!localStorage.getItem("matches") || DayJS().diff(JSON.parse(localStorage.getItem("matches") as string).timeStamp as number, "minutes") >= 7) {
-		Axios<{
+		return Axios<{
 			response: Match[]
 		}>(`https://v3.football.api-sports.io/fixtures?live=${ [1,2,3,4,9,10,15,16,39,45,61,78,135,140,143,253,257,556,667,772].join("-") }`, {
 			"headers": {
 				"x-apisports-key": import.meta.env.VITE_FOOTBALL_API_KEY
 			}
-		}).then(({ data }) =>
+		}).then(({ data }) => {
+			const Matches = mapMatch(data.response);
+
 			localStorage.setItem("matches", JSON.stringify({
 				timeStamp: Date.now(),
-				data: mapMatch(data.response)
-			})));
+				data: Matches
+			}))
+
+			return Matches;
+		});
 	};
 
-	return JSON.parse(localStorage.getItem("matches") as string)?.data as typeof mapMatch extends (data: Match[]) => infer R ? R : never;
+	return JSON.parse(localStorage.getItem("matches") as string)?.data as ReturnType<typeof mapMatch>;
 };
 
 export const getSoccerNews = () => {
 	if (!localStorage.getItem("soccerNews") || DayJS().diff(JSON.parse(localStorage.getItem("soccerNews") as string).timeStamp as number, "hours") >= 1) {
-		return Axios<SoccerNews[]>("https://football-news-aggregator-live.p.rapidapi.com/news/onefootball", {
+		return Axios<SoccerNews[]>("https://football-news-aggregator-live.p.rapidapi.com/news/espn", {
 			"headers": {
 				"x-rapidapi-key": import.meta.env.VITE_FOOTBALL_AGGREGATOR_API_KEY,
 				"x-rapidapi-host": "football-news-aggregator-live.p.rapidapi.com"

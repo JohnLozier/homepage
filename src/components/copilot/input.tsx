@@ -15,12 +15,14 @@ const Input = (props: {
 }) => {
 
 	const [ locked, setLocked ] = createSignal(false);
+	const [ isEmpty, setIsEmpty ] = createSignal(true);
 
 	let input: HTMLTextAreaElement;
 
 	const onInput = () => {
 		input.style.height = "auto";
-		input.style.height = Math.ceil(input.scrollHeight / 24) * 1.5 + "rem";
+		input.style.height = Math.min(Math.ceil(input.scrollHeight / 24), 15) * 1.5 + "rem";
+		setIsEmpty(input.value.length <= 0);
 	};
 
 	createEffect(() =>
@@ -86,14 +88,14 @@ const Input = (props: {
 	};
 
 	return <div class="m-3 items-center p-3 gap-x-2 flex flex-row bg-black/10 rounded-lg">
-		<textarea ref={ input! } onKeyUp={ ({ key, shiftKey }) =>
-			key == "Enter" && !shiftKey && !locked() ?
+		<textarea ref={ input! } onKeyUp={ ({ key, shiftKey, target }) =>
+			key == "Enter" && !shiftKey && !locked() && (target as HTMLTextAreaElement).value.match(/\S/)?.[0] ?
 				sendMessage() :
 				onInput()
 		} onInput={ ({ inputType }) =>
 			inputType != "insertText" && onInput()
 		} class="flex-1 resize-none text-base outline-none bg-transparent h-12 text-white/70 caret-white/70 font-mona" />
-		<FiSend style={ locked() ? {
+		<FiSend style={ locked() || isEmpty() ? {
 			opacity: 0.5,
 			"pointer-events": "none"
 		} : {} } onClick={ sendMessage } stroke-width={ 2 } class="w-6 h-6 transition-[transform] duration-200 hover:scale-110 cursor-pointer text-white/70" />

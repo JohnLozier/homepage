@@ -1,10 +1,8 @@
 import { BACKUP_GREETING, PROMPT } from "../../env";
 import { For, createResource } from "solid-js";
 import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, StartChatParams }from "@google/generative-ai";
-import { getMatches, getSoccerNews } from "../lib/soccer";
 
 import DayJS from "dayjs";
-import { getNews } from "../lib/news";
 
 const model = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY).getGenerativeModel({
 	model: "gemini-1.5-flash",
@@ -58,19 +56,32 @@ const Greeting = () => {
 					text: PROMPT
 				},
 				{
-					text: `Here is a list of current news: ${ JSON.parse(localStorage.getItem("news") as string)?.data?.map(({ description }: {
+					text: `Here is a list of current news: ${ JSON.parse(localStorage.getItem("news") as string)?.data?.slice(0, 5).map(({ description }: {
 						description: string,
 						title: string,
 						pubDate: string
-					}) => `"${ description }"`).join(",") || "Could not fetch news" }`
+					}) => `"${ description }"`).join(",") || "Failed to fetch news, some may still exist" }`
 				},
 				{
-					text: `Here is a list of some live soccer scores: ${ getMatches()?.map(({ teams, time, league } ) => `"${ teams.home.name }" ${ teams.home.goals } - ${ teams.away.goals } "${ teams.away.name }" in a ${ league } match at ${ time } minutes`).join(", ") || "Could not fetch soccer games" }`
+					text: `Here is a list of some live soccer scores: ${ JSON.parse(localStorage.getItem("news") as string)?.map?.(({ teams, time, league }: {
+						teams: {
+							home: {
+								name: string,
+								goals: number
+							},
+							away: {
+								name: string,
+								goals: number
+							}
+						},
+						time: number,
+						league: string
+					} ) => `"${ teams.home.name }" ${ teams.home.goals } - ${ teams.away.goals } "${ teams.away.name }" in a ${ league } match at ${ time } minutes`).join(", ") || "Failed to fetch soccer games, some may still exist" }`
 				},
 				{
 					text: `Here is a list of some current soccer news: ${ JSON.parse(localStorage.getItem("soccerNews") as string)?.data?.map(({ title }: {
 						title: string
-					}) => `"${ title.replace(/[^\x00-\x7F]/g, "") }"`).join(",") || "Could not fetch soccer news" }`
+					}) => `"${ title.replace(/[^\x00-\x7F]/g, "") }"`).join(",") || "Failed to fetch soccer news, some may still exist" }`
 				}
 			])
 			.then(res => res.response.text())

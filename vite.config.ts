@@ -1,3 +1,4 @@
+import SVGPlugin from "vite-plugin-solid-svg";
 import SolidJS from "vite-plugin-solid";
 import { defineConfig } from "vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
@@ -11,6 +12,9 @@ export default defineConfig({
 	},
 	plugins: [
 		SolidJS(),
+		SVGPlugin({
+			defaultAsComponent: false,
+		}),
 		viteSingleFile()
 	],
 	build: {

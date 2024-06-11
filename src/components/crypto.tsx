@@ -35,9 +35,9 @@ const Crypto = () => {
 		<For each={ data() }>
 			{ ({ symbol, price_change_percentage_24h, current_price, id }, index) =>
 				<div class="flex w-64 flex-row">
-					<img style={ {
+					<img draggable="false" style={ {
 						"animation-delay": `${ index() * 0.3 }s`
-					} } class="self-center animate-fadeIn opacity-0 w-12" src={ coins[id as keyof typeof coins] }/>
+					} } class="self-center animate-fadeIn select-none opacity-0 w-12" src={ coins[id as keyof typeof coins] }/>
 					<div class="flex ml-2 flex-col">
 						<h1 style={ {
 							"animation-delay": `${ index() * 0.3 + 0.5 }s`

@@ -10,7 +10,7 @@ const Copilot = (props: {
 	const [ showSidebar, setShowSidebar ] = createSignal(false);
 
 	document.addEventListener("keydown", (event) =>
-		!["input", "textarea"].includes((event.target as HTMLElement).localName) && event.key == "c" ?
+		!["input", "textarea"].includes((event.target as HTMLElement).localName) && event.key == "c" && !event.ctrlKey ?
 			[setShowSidebar(current => !current), event.preventDefault()] :
 			event.key == "Escape" && setShowSidebar(false)
 	);

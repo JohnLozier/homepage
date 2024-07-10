@@ -37,7 +37,7 @@ const Background = (props: {
 
 		return blob ? URL.createObjectURL(blob) : ((await Unsplash.photos.getRandom({
 			collectionIds: [ "U4hZz7KKhQU" ]
-		}))?.response as Random)?.urls?.full + "&w=1440";
+		}))?.response as Random)?.urls?.full + "&h=1440";
 	}, {
 		deferStream: true
 	});
@@ -138,7 +138,7 @@ const Background = (props: {
 						collectionIds: [ "U4hZz7KKhQU" ]
 					});
 
-					const { data } = await Axios((unsplash.response as Random).urls.full + "&w=1440", {
+					const { data } = await Axios((unsplash.response as Random).urls.full + "&h=1440", {
 						responseType: "blob"
 					});
 					set("unsplash", "images", "image", await data);

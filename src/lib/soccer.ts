@@ -23,7 +23,7 @@ export const getMatches = () => {
 			},
 			time: fixture.status.elapsed,
 			league: league.name,
-			events: (events.length > 2 ? events.filter(({ type }) => type != "subst") : events).map(({ type, team, player, assist, time, detail }) => ({
+			events: (events.length > 4 || (data.length > 2 && events.length < 7) ? events.filter(({ type }) => type != "subst") : events).map(({ type, team, player, assist, time, detail }) => ({
 				time: `${ time.elapsed }${ time.extra ? "+" + time.extra : "" }`,
 				player: player.name,
 				assist: assist.name,
@@ -66,7 +66,7 @@ export const getSoccerNews = () => {
 				"x-rapidapi-host": "football-news-aggregator-live.p.rapidapi.com"
 			}
 		}).then(({ data }) => {
-			const removedDuplicates = data.reduce((prev: SoccerNews[], current) => prev.findIndex(e => e.title == current.title) < 0 ? [ ...prev, current ] : prev, []);
+			const removedDuplicates = data.slice(0, 5).reduce((prev: SoccerNews[], current) => prev.findIndex(e => e.title == current.title) < 0 ? [ ...prev, current ] : prev, []);
 
 			localStorage.setItem("soccerNews", JSON.stringify({
 				timeStamp: Date.now(),
@@ -75,7 +75,7 @@ export const getSoccerNews = () => {
 
 			return removedDuplicates;
 		});
-	} else {
-		return JSON.parse(localStorage.getItem("soccerNews") as string)?.data as SoccerNews[];
-	};
+	}
+
+	return JSON.parse(localStorage.getItem("soccerNews") as string)?.data as SoccerNews[];
 };

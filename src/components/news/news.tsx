@@ -2,6 +2,7 @@ import { For, createEffect, createResource, createSignal, onMount } from "solid-
 
 import Article from "./article";
 import ESPN from "../../assets/espn.svg";
+import { getFinanceNews } from "../../lib/finance";
 import { getNews } from "../../lib/news";
 import { getSoccerNews } from "../../lib/soccer";
 
@@ -37,6 +38,14 @@ const News = (props: {
 		authorImg: ESPN,
 	})).sort( () => 0.5 - Math.random()));
 
+	const [ FinanceNews ] = createResource(async () => (await getFinanceNews())?.map(news => ({
+		content: news.title,
+		img: news.image_url,
+		link: news.article_url,
+		author: news.publisher,
+		authorImg: news.icon
+	})).sort( () => 0.5 - Math.random()));
+
 	newsList().length == 0 && createEffect(() =>
 		setNewsList(current => [...current, ...(SoccerNews() ?? [])])
 	);
@@ -45,11 +54,15 @@ const News = (props: {
 		setNewsList(current => [...current, ...(News() ?? [])])
 	);
 
+	newsList().length == 0 && createEffect(() =>
+		setNewsList(current => [...current, ...(FinanceNews() ?? [])])
+	);
+
 	onMount(() =>
 		container.scrollTop = 0
 	);
 
-	return <div ref={ container! } class="[scrollbar-width:none] h-[25vh] w-full pb-5 flex-1 overflow-y-scroll">
+	return <div ref={ container! } class="[scrollbar-width:none] w-full pb-5 flex-1 overflow-y-scroll">
 		<div class="mt-2 grid-cols-3 grid items-center overflow-hidden gap-5 ">
 			<For each={ newsList() }>
 				{ (news, index) =>

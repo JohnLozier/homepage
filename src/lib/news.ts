@@ -11,6 +11,7 @@ export const getNews = () => {
 				apikey: import.meta.env.VITE_NEWS_DATA_API_KEY,
 				country: "us",
 				category: "top",
+				size: 5,
 				domain: [
 					"nytimes",
 					"cnn",
@@ -26,7 +27,7 @@ export const getNews = () => {
 
 			return data.results;
 		});
-	} else {
-		return JSON.parse(localStorage.getItem("news") as string)?.data as News[];
 	};
+
+	return JSON.parse(localStorage.getItem("news") as string)?.data as News[];
 };

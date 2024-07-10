@@ -11,12 +11,18 @@ const Scores = () => {
 
 	const [ amountShown, setAmountShown ] = createSignal(INITIAL_SHOWN);
 
-	return <div onClick={ () => setAmountShown(amount => amount == -1 ? INITIAL_SHOWN : -1) } class="mt-autogap-y-2 flex-col-reverse w-max left-10 transition-all select-none cursor-pointer duration-500 absolute bottom-5 h-max overflow-hidden flex justify-stretch">
-		<For each={ scores() }>
-			{ (match, index) =>
-				<Score match={ match } index={ index } shown={ amountShown } INITIAL_SHOWN={ INITIAL_SHOWN } />
-			}
-		</For>
+	let container: HTMLDivElement;
+
+	return <div class="absolute left-10 bottom-5 flex items-center flex-col gap-y-1">
+		<div ref={ container! } onClick={ () => setAmountShown(amount => amount == -1 ? INITIAL_SHOWN : -1) } style={ {
+			"pointer-events": scores()?.length! > INITIAL_SHOWN ? undefined : "none",
+		} } class="flex-col-reverse w-max select-none cursor-pointer h-max overflow-hidden flex justify-stretch">
+			<For each={ scores() }>
+				{ (match, index) =>
+					<Score match={ match } index={ index } shown={ amountShown } INITIAL_SHOWN={ INITIAL_SHOWN } length={ scores()?.length! } />
+				}
+			</For>
+		</div>
 	</div>
 };
 

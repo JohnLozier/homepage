@@ -13,10 +13,11 @@ const Scores = () => {
 
 	let container: HTMLDivElement;
 
-	return <div class="absolute left-10 bottom-5 flex items-center flex-col gap-y-1">
+	return <div class="absolute left-10 bottom-5 inset-y-5 flex justify-end items-center flex-col gap-y-1">
 		<div ref={ container! } onClick={ () => setAmountShown(amount => amount == -1 ? INITIAL_SHOWN : -1) } style={ {
 			"pointer-events": scores()?.length! > INITIAL_SHOWN ? undefined : "none",
-		} } class="flex-col-reverse w-max select-none cursor-pointer h-max overflow-hidden flex justify-stretch">
+			"overflow": amountShown() == -1 ? "scroll" : "hidden"
+		} } class="flex-col-reverse w-max select-none cursor-pointer max-h-full [scrollbar-width:none] flex justify-stretch">
 			<For each={ scores() }>
 				{ (match, index) =>
 					<Score match={ match } index={ index } shown={ amountShown } INITIAL_SHOWN={ INITIAL_SHOWN } length={ scores()?.length! } />

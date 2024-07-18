@@ -10,8 +10,8 @@ import NASDAQ from "../../assets/stocks/NASDAQ.svg";
 import DOW from "../../assets/stocks/DOW.svg";
 import { IconTypes } from "solid-icons";
 import { getStocks } from "../../lib/finance";
-import { TbBrandMeta, TbDeviceGamepad } from "solid-icons/tb";
-
+import { TbBrandMeta } from "solid-icons/tb";
+import { IoGameController } from "solid-icons/io";
 const icons = {
 	ETH,
 	BTC,
@@ -23,7 +23,7 @@ const icons = {
 	NVDA: BsNvidia,
 	META: TbBrandMeta,
 	TSLA: SiTesla,
-	GME: TbDeviceGamepad,
+	GME: IoGameController,
 	IXIC: NASDAQ,
 	DJI: DOW
 };

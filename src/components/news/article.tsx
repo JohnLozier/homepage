@@ -13,7 +13,6 @@ const Article = (props: {
 	date?: string,
 	index: number
 }) => {
-
 	return <a draggable="false" style={ {
 		"background-color": props.light ? "rgb(255 255 255 / 0.1)" : "rgb(0 0 0 / 0.1)",
 		"animation-delay": `${ props.index * 200 }ms`

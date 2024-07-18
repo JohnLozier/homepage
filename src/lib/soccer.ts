@@ -3,10 +3,55 @@ import DayJS from "dayjs";
 import { Match } from "../types/match";
 import { SoccerNews } from "../types/soccerNews";
 
+const teamIDs = [
+	529,
+	9568,
+	530,
+	541,
+	33,
+	34,
+	40,
+	42,
+	47,
+	49,
+	50,
+	66,
+	2,
+	85,
+	16489,
+	2384,
+	10,
+	9,
+	25,
+	157,
+	165,
+	168,
+	492,
+	489,
+	496,
+	505,
+	194,
+	1118,
+	768,
+	26,
+	6,
+	16,
+	27,
+	1,
+	3,
+	7,
+	24,
+	5529,
+	12,
+	4
+];
+
 export const getMatches = () => {
 
 	const mapMatch = (data: Match[]) =>
-		data.map(({ fixture, goals, league, teams, events }) => ({
+		data.filter(({ league, teams }) =>
+			((league.id == 2 || league.id == 3) && league.round.includes("Qualifying")) ? false : (league.id == 667 || league.id == 10) ? teamIDs.includes(teams.home.id) || teamIDs.includes(teams.away.id) : true
+		).map(({ fixture, goals, league, teams, events }) => ({
 			teams: {
 				home: {
 					name: teams.home.name,
@@ -34,7 +79,7 @@ export const getMatches = () => {
 				},
 				type: type
 			}))
-		}))
+		})).sort(({ teams: { home, away } }) => teamIDs.includes(home.id) || teamIDs.includes(away.id) ? 1 : 0)
 
 	if (!localStorage.getItem("matches") || DayJS().diff(JSON.parse(localStorage.getItem("matches") as string).timeStamp as number, "minutes") >= 7) {
 		return Axios<{

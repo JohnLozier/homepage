@@ -46,7 +46,10 @@ const Score = ({
 			"animation": index() < INITIAL_SHOWN ? `fadeIn 1s ease-out ${ (index() + 1) * 500 }ms forwards` : undefined
 		} } class="font-montserrat transition-[filter,opacity] duration-500 text-white/80 font-semibold grid grid-cols-[1fr_auto_1fr] w-full gap-x-2">
 			<div class="flex items-center gap-x-2 flex-rown overflow-hidden">
-				<img draggable="false" src={ homeIcon() } class="h-10 w-10 select-none" />
+				<img draggable="false" style={ {
+					opacity: homeIcon() ? 1 : 0,
+					filter:  homeIcon() ? "blur(0px)" : "blur(5px)"
+				} } src={ homeIcon() } class="h-10 w-10 transition-[opacity,filter] select-none" />
 				<span class="text-ellipsis overflow-hidden text-nowrap">{ match.teams.home.name }</span>
 			</div>
 			<span class="flex flex-row items-center gap-x-2 w-min col-auto">
@@ -58,7 +61,10 @@ const Score = ({
 			</span>
 			<div class="flex items-center gap-x-2 justify-end flex-rown overflow-hidden">
 				<span class="text-ellipsis overflow-hidden text-nowrap">{ match.teams.away.name }</span>
-				<img draggable="false" src={ awayIcon() } class="h-10 w-10 select-none" />
+				<img style={ {
+					opacity: awayIcon() ? 1 : 0,
+					filter:  awayIcon() ? "blur(0px)" : "blur(5px)"
+				} } draggable="false" src={ awayIcon() } class="h-10 transition-[opacity,filter] w-10 select-none" />
 			</div>
 		</div>
 		<div class="gap-y-2 grid-cols-2 mt-2 grid-flow-col grid">

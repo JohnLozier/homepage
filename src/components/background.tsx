@@ -115,11 +115,9 @@ const Background = (props: {
 	}));
 
 	return <Switch fallback={
-		<div style={ {
-			"background": `hsl(${ rgb()[0] } 100% 50%)`
-		} } class="w-full absolute h-full -z-10">
+		<div class="w-full absolute h-full -z-10">
 			<div style={ {
-				"background": `linear-gradient(45deg, hsl(${ rgb()[0] } 100% 50%), hsl(${ rgb()[1] } 100% 50%))`
+				"background": `linear-gradient(in lch 45deg, hsl(${ rgb()[0] } 100% 50%), hsl(${ rgb()[1] } 100% 50%))`
 			} } class="w-full h-full animate-fadeIn duration-500" />
 		</div>
 	}>

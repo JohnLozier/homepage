@@ -8,10 +8,6 @@ import { MessageType } from "../../types/geminiMessage";
 import Title from "./message/title";
 import Menu from "./menu/menu";
 
-const model = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY).getGenerativeModel({
-	model: "gemini-1.5-pro",
-});
-
 const Sidebar = (props: {
 	showSidebar: Accessor<boolean>;
 	setShowSidebar: Setter<boolean>;
@@ -19,7 +15,7 @@ const Sidebar = (props: {
 }) => {
 
 	const [ width, setWidth ] = createSignal<string>();
-	const [ conversation, setConversation ] = createSignal<MessageType[]>(localStorage.getItem("copilotHistory") ? JSON.parse(localStorage.getItem("copilotHistory") as string) : [{
+	const [ conversation, setConversation ] = createSignal<MessageType[]>(localStorage.getItem("copilotHistory") && JSON.parse(localStorage.getItem("copilotHistory") as string).length % 2 == 0 ? JSON.parse(localStorage.getItem("copilotHistory") as string) : [{
 		from: "model",
 		message: "Hello! I'm Gemini, your personal AI assistant. How can I help you today?"
 	}]);
@@ -30,6 +26,16 @@ const Sidebar = (props: {
 
 	let mouseDown = false;
 	let firstOpen = true;
+
+	const defaultModel = localStorage.getItem("model") ?? "gemini-1.5-pro";
+
+	let model = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY).getGenerativeModel({
+		model: defaultModel,
+	}, {
+		apiVersion: "v1beta"
+	});
+
+	console.log(model)
 
 	let Gemini = model.startChat({
 		generationConfig: {
@@ -55,7 +61,7 @@ const Sidebar = (props: {
 			category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
 			threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
 		}],
-		history: localStorage.getItem("copilotHistory") ? (JSON.parse(localStorage.getItem("copilotHistory") as string) as MessageType[]).slice(1).map(({ from, message }) => {
+		history: localStorage.getItem("copilotHistory") && JSON.parse(localStorage.getItem("copilotHistory") as string).length % 2 == 0 ? (JSON.parse(localStorage.getItem("copilotHistory") as string) as MessageType[]).slice(1).map(({ from, message }) => {
 			return {
 				role: from,
 				parts: [{
@@ -107,7 +113,54 @@ const Sidebar = (props: {
 					</div>
 				</div>
 			</div>
-			<Menu messageContainer={ messageContainer! } setWidth={ setWidth as Setter<string> } setConversation={ setConversation } resetGemini={ () => {
+			<Menu messageContainer={ messageContainer! } light={ props.light } defaultModel={ defaultModel } setWidth={ setWidth as Setter<string> } setConversation={ setConversation } changeModel={ newModel => {
+				model = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY).getGenerativeModel({
+					model: newModel,
+				});
+
+				Gemini = model.startChat({
+					generationConfig: {
+						responseMimeType: "text/plain"
+					},
+					safetySettings: [{
+						category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+						threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+					},
+					{
+						category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+						threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+					},
+					{
+						category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+						threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+					},
+					{
+						category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+						threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+					},
+					{
+						category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+						threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+					}],
+					history: conversation().slice(1).length % 2 == 1 ? conversation().slice(1).map(({ from, message }) => ({
+						role: from,
+						parts: [{
+							text: message
+						}]
+					})) : conversation().length == 1 ? [] : conversation().slice(1,-1).map(({ from, message }) => ({
+						role: from,
+						parts: [{
+							text: message
+						}]
+					}))
+				});
+
+				if (conversation().slice(1).length % 2 == 1 && conversation().length != 1) {
+					setConversation(current =>
+						current.slice(0, -1)
+					);
+				};
+			} } resetGemini={ () => {
 				Gemini = model.startChat({
 					generationConfig: {
 						responseMimeType: "text/plain"

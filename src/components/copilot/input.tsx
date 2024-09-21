@@ -52,7 +52,6 @@ const Input = (props: {
 		try {
 			const geminiResponse = await props.Gemini().sendMessageStream(text);
 
-
 			for await (const message of geminiResponse.stream) {
 				geminiResponseText += message.text();
 				const isAtBottom = Math.abs(props.messageContainer.scrollHeight - props.messageContainer.scrollTop - props.messageContainer.clientHeight) < 50;
@@ -71,17 +70,21 @@ const Input = (props: {
 		};
 
 		props.setConversation(current => {
-			localStorage.setItem("copilotHistory", JSON.stringify([ ...current, {
-				from: "model" as const,
-				message: geminiResponseText
-			}]));
+			if (current.length % 2 == 0) {
+				localStorage.setItem("copilotHistory", JSON.stringify([ ...current, {
+					from: "model" as const,
+					message: geminiResponseText
+				}]));
 
-			props.geminiContainer.innerHTML = "";
+				props.geminiContainer.innerHTML = "";
 
-			return [ ...current, {
-				from: "model" as const,
-				message: geminiResponseText
-			}]
+				return [ ...current, {
+					from: "model" as const,
+					message: geminiResponseText
+				}];
+			} else {
+				return current;
+			}
 		});
 
 		setLocked(false);

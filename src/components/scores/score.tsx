@@ -30,7 +30,7 @@ const Score = ({
 	const [ awayIcon ] = createResource(() => ConvertToOpacity(match.teams.away.icon));
 
 	return <div class="flex w-[32rem] flex-col">
-		{ INITIAL_SHOWN - 1 == index() && length < INITIAL_SHOWN &&
+		{ INITIAL_SHOWN - 1 == index() && length > INITIAL_SHOWN &&
 			<div style={ {
 				opacity: shown() != -1 ? 1 : 0,
 				filter: shown() != -1 ? "blur(0)" : "blur(5px)",

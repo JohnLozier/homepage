@@ -12,7 +12,7 @@ export default {
 			animation: {
 				"fadeIn": "fadeIn 1s ease-out forwards",
 				"up": "up 1s ease-out",
-				"grow": "grow 0.7s ease-out"
+				"grow": "grow 0.7s ease-out",
 			},
 			keyframes: {
 				"fadeIn": {
@@ -36,7 +36,8 @@ export default {
 				"grow": {
 					"0%": {
 						width: 0,
-						height: 0
+						height: 0,
+						"box-shadow": "transparent 0 0 0 0"
 					},
 					"40%": {
 						width: "30rem",
@@ -44,7 +45,8 @@ export default {
 					},
 					"100%": {
 						width: "40rem",
-						height: "5rem"
+						height: "5rem",
+						"box-shadow": "var(--tw-shadow-color) 0 0 20px 5px"
 					}
 				}
 			}

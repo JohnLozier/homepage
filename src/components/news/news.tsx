@@ -3,6 +3,7 @@ import { For, createEffect, createResource, createSignal, onMount } from "solid-
 import Article from "./article";
 import ESPN from "../../assets/espn.svg";
 import { getFinanceNews } from "../../lib/finance";
+import { getHighlights } from "../../lib/highlights";
 import { getNews } from "../../lib/news";
 import { getSoccerNews } from "../../lib/soccer";
 
@@ -13,11 +14,15 @@ const News = (props: {
 	let container: HTMLDivElement
 
 	const [ newsList, setNewsList ] = createSignal<{
-		img: string,
+		img?: string,
 		author?: string,
 		content?: string,
-		authorImg: string,
+		authorImg?: string,
 		link: string,
+		insights?: {
+			ticker: string,
+			positive: boolean
+		}[],
 		date?: string
 	}[]>([]);
 
@@ -40,10 +45,20 @@ const News = (props: {
 
 	const [ FinanceNews ] = createResource(async () => (await getFinanceNews())?.map(news => ({
 		content: news.title,
-		img: news.image_url,
+		img: news.image_url || undefined,
 		link: news.article_url,
 		author: news.publisher,
-		authorImg: news.icon
+		authorImg: news.icon,
+		insights: news.insights
+	})).sort( () => 0.5 - Math.random()));
+
+	const [ Highlights ] = createResource(async () => (await getHighlights())?.map(highlights => ({
+		content: highlights.title || `${ highlights.match.homeTeam } VS ${ highlights.match.awayTeam } in the ${ highlights.match.country } ${ highlights.match.league }`,
+		img: highlights.imgUrl,
+		link: highlights.url,
+		date: highlights.match.date,
+		author: (highlights.author.channel || highlights.author.source).slice(0,1).toUpperCase() + (highlights.author.channel || highlights.author.source).slice(1),
+		authorImg: undefined
 	})).sort( () => 0.5 - Math.random()));
 
 	newsList().length == 0 && createEffect(() =>
@@ -56,6 +71,10 @@ const News = (props: {
 
 	newsList().length == 0 && createEffect(() =>
 		setNewsList(current => [...current, ...(FinanceNews() ?? [])])
+	);
+
+	newsList().length == 0 && createEffect(() =>
+		setNewsList(current => [...current, ...(Highlights() ?? [])])
 	);
 
 	onMount(() =>
@@ -74,6 +93,7 @@ const News = (props: {
 						authorImg={ news.authorImg }
 						link={ news.link }
 						date={ news.date }
+						insights={ news.insights }
 						index={ index() }
 					/>
 				}

@@ -29,7 +29,7 @@ const Weather = () => {
 
 					return <Icon style={ {
 						"animation-delay": !cached ? "0.90s" : "0s"
-					} } color="white" stroke-width={ 1.5 } class="w-12 h-12 animate-fadeIn" />
+					} } color="white" stroke-width={ 1.5 } class="w-12 h-12  opacity-0 animate-fadeIn" />
 				})()
 			}
 			<div class="flex flex-col h-full">

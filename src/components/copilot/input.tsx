@@ -49,6 +49,8 @@ const Input = (props: {
 
 		let geminiResponseText = "";
 
+		const history = (await props.Gemini().getHistory()).length;
+
 		try {
 			const geminiResponse = await props.Gemini().sendMessageStream(text);
 
@@ -61,6 +63,20 @@ const Input = (props: {
 				isAtBottom && props.messageContainer.scroll({
 					top: props.messageContainer.scrollHeight,
 					behavior: "smooth"
+				});
+			};
+
+			if ((await props.Gemini().getHistory()).length == history) {
+				props.Gemini().params?.history?.push({
+					role: "user",
+					parts: [{
+						text: text
+					}]
+				}, {
+					role: "model",
+					parts: [{
+						text: geminiResponseText
+					}]
 				});
 			};
 		} catch (error) {
@@ -92,9 +108,11 @@ const Input = (props: {
 
 	return <div class="m-3 items-center p-3 gap-x-2 flex flex-row bg-black/10 rounded-lg">
 		<textarea ref={ input! } onKeyUp={ ({ key, shiftKey, target }) =>
-			key == "Enter" && !shiftKey && !locked() && (target as HTMLTextAreaElement).value.match(/\S/)?.[0] ?
-				sendMessage() :
-				onInput()
+			key == "Enter" && !shiftKey && !locked() && (target as HTMLTextAreaElement).value.match(/\S/)?.[0] && sendMessage()
+		} onKeyDown={ (e) =>
+			e.key == "Enter" && !e.shiftKey && !locked() && (e.target as HTMLTextAreaElement).value.match(/\S/)?.[0] ?
+				e.preventDefault()
+				: onInput()
 		} onInput={ ({ inputType }) =>
 			inputType != "insertText" && onInput()
 		} class="flex-1 resize-none text-base outline-none bg-transparent h-12 text-white/70 caret-white/70 font-mona" />

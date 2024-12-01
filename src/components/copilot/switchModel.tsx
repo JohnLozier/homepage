@@ -13,11 +13,6 @@ const Models = [
 		name: "Gemini 1.5 Pro",
 		experimental: false
 	},
-	{
-		model: "gemini-1.0-pro",
-		name: "Gemini 1.0 Pro",
-		experimental: false
-	},
 	// {
 	// 	model: "text-embedding-004",
 	// 	name: "Text Embedding",
@@ -29,13 +24,13 @@ const Models = [
 	// 	experimental: false
 	// },
 	{
-		model: "gemini-1.5-pro-exp-0827",
-		name: "Gemini 1.5 Pro",
+		model: "gemini-exp-1121",
+		name: "Gemini 1121",
 		experimental: true
 	},
 	{
-		model: "gemini-1.5-flash-exp-0827",
-		name: "Gemini 1.5 Flash",
+		model: "gemini-exp-1114",
+		name: "Gemini 1114",
 		experimental: true
 	},
 	{
@@ -59,10 +54,15 @@ const SwitchModel = ({ light, changeModel, defaultModel }: SwitchModelProps) => 
 		"border-bottom-left-radius": focused() ? "0" : "0.5rem",
 		"border-bottom-right-radius": focused() ? "0" : "0.5rem",
 		background: light ? "#ffffff19" : "#0000000C",
-	} } onBlur={ console.log } onClick={ () => setFocused(current => !current) } class="text-white/80 backdrop-blur-sm px-3 relative flex justify-center cursor-pointer font-montserrat z-10 text-xs font-semibold py-1 bg-white/10 rounded-lg">
-		<span style={ {
+	} } onClick={ () => setFocused(current => !current) } class="text-white/80 backdrop-blur-sm px-3 relative flex justify-center cursor-pointer font-montserrat z-10 text-xs font-semibold py-1 bg-white/10 rounded-lg">
+		<div class="absolute self-center flex flex-row duration-500 transition-opacity items-center gap-x-2 justify-center" style={ {
 			opacity: focused() ? 0.2 : 1
-		} } class="absolute self-center duration-500 transition-opacity">{ Models.find(({ model }) => model == selected())?.name }</span>
+		} }>
+			<span>{ Models.find(({ model }) => model == selected())?.name }</span>
+			<Show when={ Models.find(({ model }) => model == selected())?.experimental }>
+				<TbAlertTriangle class="text-white" stroke-width={ 3 } />
+			</Show>
+		</div>
 		<div class="flex flex-col h-5 opacity-0">
 			<For each={ Models }>
 				{ ({ name, experimental }) =>
@@ -87,7 +87,7 @@ const SwitchModel = ({ light, changeModel, defaultModel }: SwitchModelProps) => 
 						localStorage.setItem("model", model);
 					} } style={ {
 						display: focused() ? "flex" : "none",
-						"animation-delay": `${ index() * 200 }ms`
+						"animation-delay": `${ index() * 100 }ms`
 					} } class="flex animate-fadeIn justify-center [animation-duration:500ms] gap-x-2 opacity-0 items-center w-full flex-row hover:bg-black/10 py-2">
 						<span style={ {
 							opacity: model == selected() ? 1 : 0.6

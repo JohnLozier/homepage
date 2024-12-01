@@ -24,7 +24,8 @@ const Background = (props: {
 
 	const [ rgb, setRGB ] = createSignal([
 		rand,
-		(rand + 75) % 360
+		(rand + 75) % 360,
+		(rand + 150) % 360
 	]);
 
 	const [ image, { refetch } ] = createResource(props.type, async (type) => {
@@ -49,20 +50,23 @@ const Background = (props: {
 		case "gradient":
 			setRGB([
 				newRand,
-				(newRand + 75) % 360
+				(newRand + 75) % 360,
+				(newRand + 150) % 360
 			]);
 
 			break;
 		case "animated":
 			setRGB([
 				newRand,
-				(newRand + 75) % 360
+				(newRand + 75) % 360,
+				(newRand + 75) % 360,
 			]);
 
 			const interval = setInterval(() => {
 				setRGB(current => [
 					(current[0] + 1) % 360,
-					(current[1] + 1) % 360
+					(current[1] + 1) % 360,
+					(current[2] + 1) % 360
 				]);
 			}, 100);
 
@@ -117,7 +121,7 @@ const Background = (props: {
 	return <Switch fallback={
 		<div class="w-full absolute h-full -z-10">
 			<div style={ {
-				"background": `linear-gradient(in lch 45deg, hsl(${ rgb()[0] } 100% 50%), hsl(${ rgb()[1] } 100% 50%))`
+				"background": `linear-gradient(in lch 45deg, hsl(${ rgb()[0] } 100% 50%), hsl(${ rgb()[1] } 100% 50%), hsl(${ rgb()[2] } 100% 50%))`
 			} } class="w-full h-full animate-fadeIn duration-500" />
 		</div>
 	}>

@@ -4,26 +4,28 @@ import Axios from "axios";
 import DayJS from "dayjs";
 
 export const getFinanceNews = () => {
-	const mapFinanceNews = (data: FinanceNews) => data.results.map(({ publisher, title, image_url, article_url, insights }) => ({
+	const mapFinanceNews = (data: FinanceNews["feed"]) => data.map(({ title, source, banner_image, ticker_sentiment, url }) => ({
 		title: title.match(/.{0,70}((?=\s))+/)?.[0],
-		publisher: publisher.name,
-		icon: publisher.logo_url,
-		image_url,
-		article_url,
-		insights: insights.slice(0,3).map(({ ticker, sentiment }) => ({
+		publisher: source,
+		icon: undefined,
+		image_url: banner_image,
+		article_url: url,
+		insights: ticker_sentiment.slice(0,3).map(({ ticker, ticker_sentiment_score }) => ({
 			ticker,
-			positive: sentiment != "Negative",
+			positive: parseFloat(ticker_sentiment_score) > 0,
 		}))
 	}));
 
 	if (!localStorage.getItem("financeNews") || DayJS().diff(JSON.parse(localStorage.getItem("financeNews") as string).timeStamp as number, "minutes") >= 7) {
-		return Axios<FinanceNews>("https://api.polygon.io/v2/reference/news", {
+		return Axios<FinanceNews>("https://www.alphavantage.co/query", {
 			params: {
-				apiKey: import.meta.env.VITE_FINANCE_NEWS_API_KEY,
+				apikey: import.meta.env.VITE_FINANCE_NEWS_API_KEY,
+				sort: "RELEVANCE",
+				function: "NEWS_SENTIMENT",
 				limit: 5,
 			}
 		}).then(({ data }) => {
-			const formated = mapFinanceNews(data);
+			const formated = mapFinanceNews(data.feed.slice(0,5));
 
 			localStorage.setItem("financeNews", JSON.stringify({
 				timeStamp: Date.now(),
@@ -62,11 +64,11 @@ export const getStocks = () => {
 						"TSLA",
 						"GME",
 						"DOGE/USD"
-					].sort(() => Math.random() - 0.5).slice(0, 5).sort(stock => stock.includes("/USD") ? 0 : 1).join(","),
+					].sort(() => Math.random() - 0.5).slice(0, 8).sort(stock => stock.includes("/USD") ? 0 : 1).join(","),
 					[
-						"SPX",
-						"IXIC",
-						"DJI"
+						// "SPX",
+						// "IXIC",
+						// "DJI"
 					][Math.floor(Math.random() * 3)]
 				].join(",")
 			}

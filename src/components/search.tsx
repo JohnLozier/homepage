@@ -63,8 +63,9 @@ const Search = (props: {
 
 	return <div style={ {
 		"background-color": props.light ? "rgb(255 255 255 / 0.1)" : "rgb(0 0 0 / 0.1)",
+		"--tw-shadow-color": !props.light ? "#00000017" : "#ffffff17",
 		"min-height": geminiResponse() != undefined ? "10rem" : "5rem",
-	} } class="bg-black/10 backdrop-blur-sm focus-within:w-[45rem] rounded-[2.5rem] animate-grow transition-all duration-500 flex flex-col w-[40rem]">
+	} } class="bg-black/10 backdrop-blur-sm shadow-[#00000017_0_0_20px_5px] shadow-[#00000017] focus-within:w-[45rem] rounded-[2.5rem] animate-grow transition-all duration-500 flex flex-col w-[40rem]">
 		<div class="h-20 items-center flex flex-row">
 			<FiSearch onClick={ onSubmit } class="w-8 animate-fadeIn [animation-delay:0.5s] [animation-duration:0.5s] opacity-0 hover:scale-110 cursor-pointer transition-transform h-8 text-white/70 ml-5" />
 			<input ref={ input! } type="search" onInput={ ({ target }) => setHasText(target.value.length > 0) } onKeyUp={ ({ key, ctrlKey }) => key == "Enter" ? onSubmit() : (key == " " && ctrlKey && geminiResponse() == undefined) ? sendGeminiMessage() : undefined } onSubmit={ onSubmit } class="text-white/70 caret-white/70 font-mona flex-1 h-2/3 outline-none font-medium bg-transparent text-[1.1rem] m-5" />

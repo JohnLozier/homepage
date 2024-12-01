@@ -1,9 +1,9 @@
 import { Accessor, For, Show, createResource } from "solid-js";
+import { FiArrowDown, FiArrowUp } from "solid-icons/fi";
 
 import Assist from "../../assets/soccer/assist.svg";
 import Ball from "../../assets/soccer/ball.svg";
 import ConvertToOpacity from "../../lib/convertToOpacity";
-import { FiArrowUp } from "solid-icons/fi";
 import RedCard from "../../assets/soccer/redCard.svg";
 import Sub from "../../assets/soccer/sub.svg";
 import YellowCard from "../../assets/soccer/yellowCard.svg";
@@ -29,14 +29,23 @@ const Score = ({
 	const [ homeIcon ] = createResource(() => ConvertToOpacity(match.teams.home.icon));
 	const [ awayIcon ] = createResource(() => ConvertToOpacity(match.teams.away.icon));
 
-	return <div class="flex w-[32rem] flex-col">
+	return <div style={ {
+		"cursor": index() < shown() || shown() == -1 ? undefined : "default",
+	} } class="flex w-[32rem] relative flex-col">
 		{ INITIAL_SHOWN - 1 == index() && length > INITIAL_SHOWN &&
 			<div style={ {
-				opacity: shown() != -1 ? 1 : 0,
-				filter: shown() != -1 ? "blur(0)" : "blur(5px)",
-				"transition-delay": shown() != -1 ? `${ (length - INITIAL_SHOWN) * 200 }ms` : "0s"
-			} } class="self-center absolute transition-[opacity,blur] duration-500 -translate-y-5 cursor-pointer">
-				<FiArrowUp class="w-5 text-white/70 h-5 hover:scale-110 opacity-0 animate-fadeIn [animation-delay:1.2s] hover:-translate-y-1 duration-300 transition-transform" />
+				display: shown() == -1 ? "none" : undefined,
+			} } class="self-center absolute transition-[opacity,blur] -translate-y-5 z-[5]">
+				<FiArrowUp style={ {
+					"animation-delay": shown() == -1 ? 0 + "ms" : (INITIAL_SHOWN * 500 + 200 + "ms")
+				} } class="w-5 text-white/70 h-5 hover:scale-110 opacity-0 animate-fadeIn hover:-translate-y-1 duration-300 transition-transform" />
+			</div>
+		}
+		{ length - 1 == index() && shown() == -1 &&
+			<div class="self-center transition-[opacity,blur] z-[5]">
+				<FiArrowDown style={ {
+				"animation-delay": (length - INITIAL_SHOWN) * 200 + 200 + "ms"
+			} } class="w-5 text-white/70 h-5 hover:scale-110 opacity-0 animate-fadeIn hover:translate-y-1 duration-300 transition-transform" />
 			</div>
 		}
 		<div style={ {

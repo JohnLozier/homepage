@@ -79,7 +79,7 @@ export const getMatches = () => {
 				},
 				type: type
 			}))
-		})).sort(({ teams: { home, away } }) => teamIDs.includes(home.id) || teamIDs.includes(away.id) ? 1 : 0)
+		})).sort(({ teams: { home, away } }) => teamIDs.includes(home.id) || teamIDs.includes(away.id) ? 0 : 1)
 
 	if (!localStorage.getItem("matches") || DayJS().diff(JSON.parse(localStorage.getItem("matches") as string).timeStamp as number, "minutes") >= 7) {
 		return Axios<{
@@ -124,3 +124,16 @@ export const getSoccerNews = () => {
 
 	return JSON.parse(localStorage.getItem("soccerNews") as string)?.data as SoccerNews[];
 };
+
+// const urlLastFiveGames =
+//     "https://football-highlights-api.p.rapidapi.com/highlights?limit=5&countryCode=US";
+
+//   const options = {
+//     method: "GET",
+//     headers: {
+//       "x-rapidapi-key": "854d52dfc6mshd9f4f8c27dcbbe9p18486fjsn64fe1a60f11d",
+//       "x-rapidapi-host": "football-highlights-api.p.rapidapi.com",
+//     },
+//   };
+
+// fetch(urlLastFiveGames, options)

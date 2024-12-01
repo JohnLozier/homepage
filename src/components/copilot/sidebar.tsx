@@ -15,7 +15,7 @@ const Sidebar = (props: {
 }) => {
 
 	const [ width, setWidth ] = createSignal<string>();
-	const [ conversation, setConversation ] = createSignal<MessageType[]>(localStorage.getItem("copilotHistory") && JSON.parse(localStorage.getItem("copilotHistory") as string).length % 2 == 0 ? JSON.parse(localStorage.getItem("copilotHistory") as string) : [{
+	const [ conversation, setConversation ] = createSignal<MessageType[]>(localStorage.getItem("copilotHistory") && JSON.parse(localStorage.getItem("copilotHistory") as string).length % 2 == 1 ? JSON.parse(localStorage.getItem("copilotHistory") as string) : [{
 		from: "model",
 		message: "Hello! I'm Gemini, your personal AI assistant. How can I help you today?"
 	}]);
@@ -27,15 +27,13 @@ const Sidebar = (props: {
 	let mouseDown = false;
 	let firstOpen = true;
 
-	const defaultModel = localStorage.getItem("model") ?? "gemini-1.5-pro";
+	const defaultModel = localStorage.getItem("model") ?? "gemini-exp-1121";
 
 	let model = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY).getGenerativeModel({
 		model: defaultModel,
 	}, {
 		apiVersion: "v1beta"
 	});
-
-	console.log(model)
 
 	let Gemini = model.startChat({
 		generationConfig: {
@@ -61,14 +59,14 @@ const Sidebar = (props: {
 			category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
 			threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
 		}],
-		history: localStorage.getItem("copilotHistory") && JSON.parse(localStorage.getItem("copilotHistory") as string).length % 2 == 0 ? (JSON.parse(localStorage.getItem("copilotHistory") as string) as MessageType[]).slice(1).map(({ from, message }) => {
+		history: (localStorage.getItem("copilotHistory") && JSON.parse(localStorage.getItem("copilotHistory") as string).length % 2 == 1) ? (JSON.parse(localStorage.getItem("copilotHistory") as string) as MessageType[]).slice(1).map(({ from, message }) => {
 			return {
 				role: from,
 				parts: [{
 					text: message
 				}]
 			};
-		}) : []
+		}) : undefined
 	});
 
 	createEffect(() => {
@@ -81,18 +79,21 @@ const Sidebar = (props: {
 		};
 	});
 
-	return <div ref={ container! } onMouseMove={ ({ x }) =>
+	return <div onDrop={ (e) => {
+		console.log(e);
+	} } onDragStart={ console.log } onDragEnd={ console.log } ref={ container! } onMouseMove={ ({ x }) =>
 		mouseDown && setWidth(Math.max(x - 8, 384) + "px")
 	} onClick={ ({ target }) =>
 		mouseDown ?
 			[ mouseDown = false, messageContainer.style.userSelect = "auto", (container.children[0] as HTMLDivElement).style.transitionProperty = "margin,opacity,width" ] :
 			target == container && props.setShowSidebar(false)
-	} class="absolute cursor-pointer transition-[backdrop-filter] duration-1000 w-full h-full z-10" style={ {
+	} class="absolute cursor-pointer select-none transition-[backdrop-filter] duration-1000 w-full h-full z-10" style={ {
 		"pointer-events": !props.showSidebar() ? "none" : undefined,
 		"backdrop-filter": !props.showSidebar() ? "blur(0)" : "blur(4px)"
 	} }>
 		<div style={ {
 			"margin-left": !props.showSidebar() ? "-24rem" : "0.75rem",
+			"box-shadow": (props.light ? "#ffffff17" : "#00000017") + (props.showSidebar() ? " 0 0 20px 5px" : " 0 0 0 0"),
 			"opacity": props.showSidebar() ? 100 : 0,
 			"width": width(),
 			"background-color": props.light ? "rgb(255 255 255 / 0.05)" : "rgb(0 0 0 / 0.1)"

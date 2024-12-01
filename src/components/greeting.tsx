@@ -95,7 +95,7 @@ const Greeting = () => {
 		initialValue: ""
 	})[0];
 
-	return <h1 class="absolute top-[min(50%,calc(100%-38rem))] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center font-montserrat [&>span]:animate-fadeIn [&>span]:opacity-0 text-white text-4xl font-black">
+	return <h1 class="absolute top-[min(50%,calc(100%-38rem))] [text-shadow:#fff_0_0px_3px] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center font-montserrat [&>span]:animate-fadeIn [&>span]:opacity-0 text-white text-4xl font-black">
 		<For each={ (generateInitialGreeting() ?? greetings[Object.keys(greetings).find(hour => parseInt(hour) >= DayJS().hour()) as keyof typeof greetings ?? 24] + BACKUP_GREETING).split(" ") }>
 			{ (char, index) =>
 				<span style={ {

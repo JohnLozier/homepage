@@ -2,7 +2,7 @@ import Fullscreen from "./fullscreen";
 import { MessageType } from "../../../types/geminiMessage";
 import Refresh from "./refresh";
 import ScrollToBottom from "./scrollToBottom";
-import type { Setter } from "solid-js";
+import { Show, type Setter } from "solid-js";
 import SwitchModel from "../switchModel";
 
 const Menu = (props: {
@@ -11,6 +11,7 @@ const Menu = (props: {
 	changeModel: (model: string) => void;
 	setWidth: Setter<string>;
 	defaultModel: string;
+	fullscreen?: true;
 	light?: boolean;
 	messageContainer: HTMLDivElement;
 }) => {
@@ -19,7 +20,9 @@ const Menu = (props: {
 		<SwitchModel defaultModel={ props.defaultModel } changeModel={ props.changeModel } light={ props.light } />
 		<ScrollToBottom messageContainer={ props.messageContainer } />
 		<Refresh setConversation={ props.setConversation } resetGemini={ props.resetGemini } />
-		<Fullscreen setWidth={ props.setWidth } />
+		<Show when={ !props.fullscreen }>
+			<Fullscreen setWidth={ props.setWidth } />
+		</Show>
 	</div>;
 };
 

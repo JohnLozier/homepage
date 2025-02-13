@@ -1,14 +1,13 @@
-import { For, Show, createResource, createSignal } from "solid-js";
+import { For, Show, createSignal } from "solid-js";
 
 import DayJS from "dayjs";
+import { light } from "~/lib/background";
 import relativeTime from "dayjs/plugin/relativeTime";
-import ConvertToOpacity from "../../lib/convertToOpacity";
 
 DayJS.extend(relativeTime);
 
 const Article = (props: {
 	img?: string,
-	light: boolean
 	authorImg?: string,
 	link: string,
 	insights?: {
@@ -23,7 +22,7 @@ const Article = (props: {
 	const [ imageFailed, setImageFailed ] = createSignal(false);
 
 	return <a draggable="false" style={ {
-		"background-color": props.light ? "rgb(255 255 255 / 0.1)" : "rgb(0 0 0 / 0.1)",
+		"background-color": light() ? "rgb(255 255 255 / 0.1)" : "rgb(0 0 0 / 0.1)",
 		"animation-delay": `${ props.index * 200 }ms`
 	} } onFocus={ ({ target }) => (target as HTMLAnchorElement).blur() } href={ props.link } class="flex w-full opacity-0 animate-[fadeIn_1s_ease-out_forwards,up_1s_ease-out] [&:hover>img]:scale-105 backdrop-blur-sm z-10 duration-300 cursor-pointer hover:-translate-y-2 transition-all bg-black/10 p-5 rounded-md h-full items-center flex-col gap-y-2">
 		<Show when={ imageFailed() || props.img == undefined } fallback={

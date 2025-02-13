@@ -10,17 +10,19 @@ const Message = ({ from, message }: MessageType, index: Accessor<number>) => {
 
 	let messages: HTMLDivElement;
 
-	from == "model" && onMount(() => {
-		if (index() != 0) {
-			messages.innerHTML = ParseMarkdown(message as string);
-		} else {
-			message.split(" ").forEach((word, wordIndex) => {
-				const span = document.createElement("span");
-				span.innerText = word + " ";
-				span.style.animationDelay = `${ wordIndex * 200 }ms`;
+	onMount(() => {
+		if (from == "model") {
+			if (index() != 0) {
+				messages!.innerHTML = ParseMarkdown(message as string);
+			} else {
+				message.split(" ").forEach((word, wordIndex) => {
+					const span = document.createElement("span");
+					span.innerText = word + " ";
+					span.style.animationDelay = `${ wordIndex * 200 }ms`;
 
-				messages.appendChild(span);
-			});
+					messages!.appendChild(span);
+				});
+			};
 		};
 	});
 

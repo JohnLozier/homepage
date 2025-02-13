@@ -1,12 +1,12 @@
 import { Accessor, For, Show, createResource } from "solid-js";
 import { FiArrowDown, FiArrowUp } from "solid-icons/fi";
 
-import Assist from "../../assets/soccer/assist.svg";
-import Ball from "../../assets/soccer/ball.svg";
+import Assist from "../../assets/soccer/assist.svg?url";
+import Ball from "../../assets/soccer/ball.svg?url";
 import ConvertToOpacity from "../../lib/convertToOpacity";
-import RedCard from "../../assets/soccer/redCard.svg";
-import Sub from "../../assets/soccer/sub.svg";
-import YellowCard from "../../assets/soccer/yellowCard.svg";
+import RedCard from "../../assets/soccer/redCard.svg?url";
+import Sub from "../../assets/soccer/sub.svg?url";
+import YellowCard from "../../assets/soccer/yellowCard.svg?url";
 import type { getMatches } from "../../lib/soccer";
 
 type MatchResult = ReturnType<typeof getMatches>;
@@ -44,8 +44,8 @@ const Score = ({
 		{ length - 1 == index() && shown() == -1 &&
 			<div class="self-center transition-[opacity,blur] z-[5]">
 				<FiArrowDown style={ {
-				"animation-delay": (length - INITIAL_SHOWN) * 200 + 200 + "ms"
-			} } class="w-5 text-white/70 h-5 hover:scale-110 opacity-0 animate-fadeIn hover:translate-y-1 duration-300 transition-transform" />
+					"animation-delay": (length - INITIAL_SHOWN) * 200 + 200 + "ms"
+				} } class="w-5 text-white/70 h-5 hover:scale-110 opacity-0 animate-fadeIn hover:translate-y-1 duration-300 transition-transform" />
 			</div>
 		}
 		<div style={ {
@@ -87,7 +87,6 @@ const Score = ({
 						opacity: (index() < shown() || shown() == -1) && index() >= INITIAL_SHOWN ? 1 : 0,
 						filter: index() < shown() || shown() == -1 ? "blur(0)" : "blur(5px)",
 						"animation": index() < INITIAL_SHOWN ? `fadeIn 1s ease-out ${ index() * 500 + (500 / match.events.length) * eventIndex() }ms forwards` : undefined,
-						// "transition-delay": index() < shown() || shown() == -1 ? index() * 200 - 100 + "ms" : shown() * 500 - (index() * 200 - 100) + "ms"
 						"transition-delay": index() < shown() || shown() == -1 ? ((index() - INITIAL_SHOWN + 1) * 200 - (200 / match.events.length) * (eventIndex() + 1)) + "ms" : (shown() - INITIAL_SHOWN + 1) * 200 - ((index() - INITIAL_SHOWN + 1) * 200 - (200 / match.events.length) * (eventIndex() + 1)) + "ms"
 					} } class="flex flex-col opacity-0 transition-[filter,opacity] duration-500">
 						<div style={ {
@@ -95,7 +94,7 @@ const Score = ({
 						} } class="flex flex-row items-center justify-end gap-x-1">
 							<h3 class="text-white/70 font-montserrat font-semibold text-lg">{ event.time }'</h3>
 							<h2 class="text-white/60 font-mona font-medium">{ event.player ?? (event.team.id == match.teams.away.id ? match.teams.away.name : match.teams.home.name) }</h2>
-							<img draggable="false" src={ event.type == "Goal" ? Ball : event.type == "subst" ? Sub : event.detail == "Red Card" ? RedCard : YellowCard } class="w-7 h-7 opacity-80 select-none" />
+							<img draggable="false" src={ event.type == "Goal" ? Ball : event.type == "subst" ? Sub : event.detail == "Red Card" ? RedCard : YellowCard } class="w-7 h-7 opacity-60 select-none" />
 						</div>
 						<Show when={ event.assist }>
 							<div style={ {

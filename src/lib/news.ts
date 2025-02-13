@@ -8,7 +8,7 @@ export const getNews = () => {
 			results: News[]
 		}>("https://newsdata.io/api/1/latest", {
 			params: {
-				apikey: import.meta.env.VITE_NEWS_DATA_API_KEY,
+				apikey: import.meta.env.PUBLIC_NEWS_DATA_API_KEY,
 				country: "us",
 				category: "top",
 				size: 5,

@@ -1,19 +1,19 @@
 {
+	"extends": "astro/tsconfigs/base",
 	"compilerOptions": {
 		"target": "ESNext",
-		"module": "ESNext",
+		"module": "esnext",
 		"explainFiles": true,
 		"jsx": "preserve",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"jsxImportSource": "solid-js",
 		"strict": true,
-		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
-		"resolveJsonModule": true,
+		"verbatimModuleSyntax": null,
 		"isolatedModules": true,
-		"types": [
-			"vite/client",
-			"vite-plugin-solid-svg/types"
-		]
+		"paths": {
+			"~/*": ["./src/*"]
+		},
+		"baseUrl": "."
 	}
 }

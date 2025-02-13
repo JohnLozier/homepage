@@ -8,7 +8,8 @@ import parseMarkdown from "../../lib/parseMarkdown";
 const Input = (props: {
 	setConversation: Setter<MessageType[]>;
 	conversation: Accessor<MessageType[]>;
-	showSidebar: Accessor<boolean>;
+	abortSignal: AbortSignal;
+	showSidebar?: Accessor<boolean>;
 	messageContainer: HTMLDivElement;
 	geminiContainer: HTMLDivElement;
 	Gemini: () => ChatSession;
@@ -20,20 +21,22 @@ const Input = (props: {
 	let input: HTMLTextAreaElement;
 
 	const onInput = () => {
-		input.style.height = "auto";
-		input.style.height = Math.min(Math.ceil(input.scrollHeight / 24), 15) * 1.5 + "rem";
-		setIsEmpty(input.value.length <= 0);
+		input!.style.height = "auto";
+		input!.style.height = Math.min(Math.ceil(input!.scrollHeight / 24), 15) * 1.5 + "rem";
+		setIsEmpty(input!.value.length <= 0);
 	};
 
 	createEffect(() =>
-		props.showSidebar() && input.focus()
+		(props.showSidebar?.() ?? true) && input!.focus()
 	);
 
 	const sendMessage = async () => {
 		setLocked(true);
-		const text = input.value;
-		input.value = "";
-		input.style.height = "3rem";
+
+		const text = input!.value;
+
+		input!.value = "";
+		input!.style.height = "3rem";
 
 		const isAtBottom = Math.abs(props.messageContainer.scrollHeight - props.messageContainer.scrollTop - props.messageContainer.clientHeight) < 50;
 
@@ -49,10 +52,10 @@ const Input = (props: {
 
 		let geminiResponseText = "";
 
-		const history = (await props.Gemini().getHistory()).length;
-
 		try {
-			const geminiResponse = await props.Gemini().sendMessageStream(text);
+			const geminiResponse = await props.Gemini().sendMessageStream(text, {
+				signal: props.abortSignal
+			});
 
 			for await (const message of geminiResponse.stream) {
 				geminiResponseText += message.text();
@@ -66,42 +69,28 @@ const Input = (props: {
 				});
 			};
 
-			if ((await props.Gemini().getHistory()).length == history) {
-				props.Gemini().params?.history?.push({
-					role: "user",
-					parts: [{
-						text: text
-					}]
-				}, {
-					role: "model",
-					parts: [{
-						text: geminiResponseText
-					}]
-				});
-			};
+			props.setConversation(current => {
+				if (current.length % 2 == 0) {
+					localStorage.setItem("copilotHistory", JSON.stringify([ ...current, {
+						from: "model" as const,
+						message: geminiResponseText
+					}]));
+
+					props.geminiContainer.innerHTML = "";
+
+					return [ ...current, {
+						from: "model" as const,
+						message: geminiResponseText
+					}];
+				} else {
+					return current;
+				}
+			});
 		} catch (error) {
 			console.error(error);
 
 			geminiResponseText = "I'm sorry, Something went wrong. Please try again later.";
 		};
-
-		props.setConversation(current => {
-			if (current.length % 2 == 0) {
-				localStorage.setItem("copilotHistory", JSON.stringify([ ...current, {
-					from: "model" as const,
-					message: geminiResponseText
-				}]));
-
-				props.geminiContainer.innerHTML = "";
-
-				return [ ...current, {
-					from: "model" as const,
-					message: geminiResponseText
-				}];
-			} else {
-				return current;
-			}
-		});
 
 		setLocked(false);
 	};

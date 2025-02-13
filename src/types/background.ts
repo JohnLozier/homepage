@@ -1,0 +1,1 @@
+export type backgroundOption = "live" | "image" | "gradient" | "animated";

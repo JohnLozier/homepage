@@ -1,4 +1,5 @@
-import { Accessor, Match, Switch, createEffect, createResource, createSignal, on, onCleanup } from "solid-js";
+import { Match, Switch, createEffect, createResource, createSignal, on, onCleanup } from "solid-js";
+import { backgroundOptions, backgroundPattern, setBackgroundPattern } from "~/lib/background";
 import { get, set } from "../lib/indexDB";
 
 import Axios from "axios";
@@ -9,16 +10,12 @@ import Youtube from "youtube-player";
 import { createApi } from "unsplash-js";
 
 const Unsplash = createApi({
-	accessKey: import.meta.env.VITE_UNSPLASH_ACCESS_KEY
+	accessKey: import.meta.env.PUBLIC_UNSPLASH_ACCESS_KEY
 });
 
-const Background = (props: {
-	type: Accessor<"gradient" | "animated" | "live" | "image">;
-}) => {
+const Background = () => {
 
 	let YoutubePlayer: YouTubePlayer;
-
-	const youtubeUrls = YOUTUBE_URLS;
 
 	const rand = Math.floor(Math.random() * 360);
 
@@ -28,8 +25,7 @@ const Background = (props: {
 		(rand + 150) % 360
 	]);
 
-	const [ image, { refetch } ] = createResource(props.type, async (type) => {
-
+	const [ image, { refetch } ] = createResource(backgroundPattern, async type => {
 		if (type != "image") {
 			return undefined;
 		};
@@ -40,13 +36,18 @@ const Background = (props: {
 			collectionIds: [ "U4hZz7KKhQU" ]
 		}))?.response as Random)?.urls?.full + "&h=1440";
 	}, {
-		deferStream: true
+		initialValue: undefined,
+		ssrLoadFrom: "initial"
 	});
+
+	document.addEventListener("keydown", ({ shiftKey, key, target }) => (key == "Enter" && !["input", "textarea"].includes((target as HTMLElement).localName)) && setBackgroundPattern(current =>
+		shiftKey ? current : backgroundOptions[(backgroundOptions.indexOf(current) + 1) % backgroundOptions.length]
+	));
 
 	createEffect(async () => {
 		const newRand = Math.floor(Math.random() * 360);
 
-		switch (props.type()) {
+		switch (backgroundPattern()) {
 		case "gradient":
 			setRGB([
 				newRand,
@@ -88,7 +89,7 @@ const Background = (props: {
 				});
 				await YoutubePlayer.mute();
 
-				YoutubePlayer.on("stateChange", async ({ data }) => {
+				YoutubePlayer.on("stateChange", ({ data }) => {
 					if (data == 0) {
 						YoutubePlayer.playVideo();
 					} else if (data == 1) {
@@ -101,9 +102,9 @@ const Background = (props: {
 
 			const url = await YoutubePlayer.getVideoUrl();
 
-			const indexOfPrevious = youtubeUrls.findIndex(id => id.replace(/\?.*/, "") == url.replace(/^(.*v=|.*(?!v=))/, ""));
+			const indexOfPrevious = YOUTUBE_URLS.findIndex(id => id.replace(/\?.*/, "") == url.replace(/^(.*v=|.*(?!v=))/, ""));
 
-			const videoID = youtubeUrls[((indexOfPrevious >= 0 ? indexOfPrevious : (Math.random() * youtubeUrls.length) | 0) + 1) % youtubeUrls.length].split("?");
+			const videoID = YOUTUBE_URLS[((indexOfPrevious >= 0 ? indexOfPrevious : (Math.random() * YOUTUBE_URLS.length) | 0) + 1) % YOUTUBE_URLS.length].split("?");
 
 			await YoutubePlayer.loadVideoById(videoID[0], parseInt(videoID[1] || "0"));
 			await YoutubePlayer.playVideo();
@@ -112,43 +113,40 @@ const Background = (props: {
 		}
 	});
 
-	createEffect(on(props.type, async () =>
-		props.type() == "image" && refetch()
-	, {
+	createEffect(on(backgroundPattern, () => {
+		backgroundPattern() == "image" && refetch();
+	}, {
 		defer: true
 	}));
 
-	return <Switch fallback={
+	return <div class="w-full h-full absolute bg-black -z-10"><Switch fallback={
 		<div class="w-full absolute h-full -z-10">
 			<div style={ {
 				"background": `linear-gradient(in lch 45deg, hsl(${ rgb()[0] } 100% 50%), hsl(${ rgb()[1] } 100% 50%), hsl(${ rgb()[2] } 100% 50%))`
 			} } class="w-full h-full animate-fadeIn duration-500" />
 		</div>
 	}>
-		<Match when={ props.type() == "live" }>
-			<div class="bg-black w-full h-full absolute -z-10">
-				<div id="youtubeIframe" class="w-full h-full transition-[opacity,filter] opacity-0 duration-1000" />
-			</div>
+		<Match when={ backgroundPattern() == "live" }>
+			<div id="youtubeIframe" class="w-full h-full transition-[opacity,filter] opacity-0 duration-1000" />
 		</Match>
-		<Match when={ props.type() == "image" }>
-			<div class="w-full h-full absolute bg-black -z-10">
-				<img draggable="false" onLoad={ async ({ target }) => {
-					(target as HTMLImageElement).style.opacity = "1";
-					(target as HTMLImageElement).style.filter = "blur(0px)";
+		<Match keyed={ false } when={ backgroundPattern() == "image" }>
+			<img draggable="false" onLoad={ async ({ target }) => {
+				(target as HTMLImageElement).style.opacity = "1";
+				(target as HTMLImageElement).style.filter = "blur(0px)";
 
-					const unsplash = await Unsplash.photos.getRandom({
-						collectionIds: [ "U4hZz7KKhQU" ]
-					});
+				const unsplash = await Unsplash.photos.getRandom({
+					collectionIds: [ "U4hZz7KKhQU" ]
+				});
 
-					const { data } = await Axios((unsplash.response as Random).urls.full + "&h=1440", {
-						responseType: "blob"
-					});
-					set("unsplash", "images", "image", await data);
+				const { data } = await Axios((unsplash.response as Random).urls.full + "&h=1440", {
+					responseType: "blob"
+				});
 
-				} } class="w-full h-full select-none object-cover transition-[opacity,filter] opacity-0 blur-sm duration-1000" src={ image?.() } />
-			</div>
+				set("unsplash", "images", "image", await data);
+
+			} } class="w-full h-full select-none object-cover transition-[opacity,filter] opacity-1 blur-sm duration-1000" src={ image() } />
 		</Match>
-	</Switch>
+	</Switch></div>;
 };
 
 export default Background;

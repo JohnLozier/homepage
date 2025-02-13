@@ -34,7 +34,7 @@ export const getHighlights = () => {
 			data: Highlight[]
 		}>("https://football-highlights-api.p.rapidapi.com/highlights", {
 			"headers": {
-				"x-rapidapi-key": import.meta.env.VITE_FOOTBALL_HIGHLIGHTS_API_KEY,
+				"x-rapidapi-key": import.meta.env.PUBLIC_FOOTBALL_HIGHLIGHTS_API_KEY,
 				"x-rapidapi-host": "football-highlights-api.p.rapidapi.com"
 			},
 			"params": {

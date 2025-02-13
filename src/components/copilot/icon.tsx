@@ -1,6 +1,6 @@
 import { Accessor, type Setter } from "solid-js";
 
-import GeminiLogo from "../../assets/gemini.svg";
+import GeminiLogo from "../../assets/gemini.svg?url";
 
 const Icon = (props: {
 	setShowSidebar: Setter<boolean>;

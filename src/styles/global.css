@@ -1,17 +1,52 @@
-@import url("https://fonts.cdnfonts.com/css/mona-sans?styles=144345,144357,144333,144339,144351,144321,144327,144315");
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-#root {
-	width: 100vw;
-	height: 100vh;
-	overflow: hidden;
+@font-face {
+	font-family: "Mona-Sans";
+	font-style: normal;
+	font-weight: 400;
+	src: local("Mona-Sans"), url("https://fonts.cdnfonts.com/s/91271/Mona-Sans-Regular.woff") format("woff");
 }
-
-body {
-	overflow: hidden;
+@font-face {
+	font-family: "Mona-Sans";
+	font-style: normal;
+	font-weight: 200;
+	src: local("Mona-Sans"), url("https://fonts.cdnfonts.com/s/91271/Mona-Sans-UltraLight.woff") format("woff");
+}
+@font-face {
+	font-family: "Mona-Sans";
+	font-style: normal;
+	font-weight: 300;
+	src: local("Mona-Sans"), url("https://fonts.cdnfonts.com/s/91271/Mona-Sans-Light.woff") format("woff");
+}
+@font-face {
+	font-family: "Mona-Sans";
+	font-style: normal;
+	font-weight: 500;
+	src: local("Mona-Sans"), url("https://fonts.cdnfonts.com/s/91271/Mona-Sans-Medium.woff") format("woff");
+}
+@font-face {
+	font-family: "Mona-Sans";
+	font-style: normal;
+	font-weight: 600;
+	src: local("Mona-Sans"), url("https://fonts.cdnfonts.com/s/91271/Mona-Sans-SemiBold.woff") format("woff");
+}
+@font-face {
+	font-family: "Mona-Sans";
+	font-style: normal;
+	font-weight: 700;
+	src: local("Mona-Sans"), url("https://fonts.cdnfonts.com/s/91271/Mona-Sans-Bold.woff") format("woff");
+}
+@font-face {
+	font-family: "Mona-Sans";
+	font-style: normal;
+	font-weight: 800;
+	src: local("Mona-Sans"), url("https://fonts.cdnfonts.com/s/91271/Mona-Sans-ExtraBold.woff") format("woff");
+}
+@font-face {
+	font-family: "Mona-Sans";
+	font-style: normal;
+	font-weight: 900;
+	src: local("Mona-Sans"), url("https://fonts.cdnfonts.com/s/91271/Mona-Sans-Black.woff") format("woff");
 }
 
 @font-face {
@@ -21,4 +56,50 @@ body {
 	font-display: swap;
 	src: url(https://fonts.gstatic.com/s/montserrat/v26/JTUSjIg1_i6t8kCHKm459Wlhyw.woff2) format("woff2");
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-  }
+}
+
+@theme {
+	--font-montserrat: "Montserrat";
+	--font-mona: "Mona-Sans";
+
+	--animate-fadeIn: fadeIn 1s ease-out forwards;
+	--animate-up: up 1s ease-out;
+	--animate-grow: grow 0.7s ease-out;
+
+	@keyframes fadeIn {
+		0% {
+			opacity: 0;
+			filter: blur(5px);
+		}
+		100% {
+			opacity: 1;
+			filter: blur(0);
+		}
+	}
+
+	@keyframes up {
+		0% {
+			transform: translateY(3rem);
+		}
+		100% {
+			transform: translateY(0rem);
+		}
+	}
+
+	@keyframes grow {
+		0% {
+			width: 0;
+			height: 0;
+			box-shadow: transparent 0 0 0 0;
+		}
+		40% {
+			width: 30rem;
+			height: 5rem;
+		}
+		100% {
+			width: 40rem;
+			height: 5rem;
+			box-shadow: var(--tw-shadow-color) 0 0 20px 5px;
+		}
+	}
+}

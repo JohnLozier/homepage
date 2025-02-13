@@ -47,7 +47,6 @@ const teamIDs = [
 ];
 
 export const getMatches = () => {
-
 	const mapMatch = (data: Match[]) =>
 		data.filter(({ league, teams }) =>
 			((league.id == 2 || league.id == 3) && league.round.includes("Qualifying")) ? false : (league.id == 667 || league.id == 10) ? teamIDs.includes(teams.home.id) || teamIDs.includes(teams.away.id) : true
@@ -86,7 +85,7 @@ export const getMatches = () => {
 			response: Match[]
 		}>(`https://v3.football.api-sports.io/fixtures?live=${ [1,2,3,4,9,10,15,16,39,45,61,78,135,140,143,253,257,556,667,772].join("-") }`, {
 			"headers": {
-				"x-apisports-key": import.meta.env.VITE_FOOTBALL_API_KEY
+				"x-apisports-key": import.meta.env.PUBLIC_FOOTBALL_API_KEY
 			}
 		}).then(({ data }) => {
 			const Matches = mapMatch(data.response);
@@ -107,7 +106,7 @@ export const getSoccerNews = () => {
 	if (!localStorage.getItem("soccerNews") || DayJS().diff(JSON.parse(localStorage.getItem("soccerNews") as string).timeStamp as number, "hours") >= 1) {
 		return Axios<SoccerNews[]>("https://football-news-aggregator-live.p.rapidapi.com/news/espn", {
 			"headers": {
-				"x-rapidapi-key": import.meta.env.VITE_FOOTBALL_AGGREGATOR_API_KEY,
+				"x-rapidapi-key": import.meta.env.PUBLIC_FOOTBALL_AGGREGATOR_API_KEY,
 				"x-rapidapi-host": "football-news-aggregator-live.p.rapidapi.com"
 			}
 		}).then(({ data }) => {

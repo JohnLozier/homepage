@@ -4,6 +4,7 @@ import Axios from "axios";
 import DayJS from "dayjs";
 
 export const getFinanceNews = () => {
+
 	const mapFinanceNews = (data: FinanceNews["feed"]) => data.map(({ title, source, banner_image, ticker_sentiment, url }) => ({
 		title: title.match(/.{0,70}((?=\s))+/)?.[0],
 		publisher: source,
@@ -19,13 +20,13 @@ export const getFinanceNews = () => {
 	if (!localStorage.getItem("financeNews") || DayJS().diff(JSON.parse(localStorage.getItem("financeNews") as string).timeStamp as number, "minutes") >= 7) {
 		return Axios<FinanceNews>("https://www.alphavantage.co/query", {
 			params: {
-				apikey: import.meta.env.VITE_FINANCE_NEWS_API_KEY,
+				apikey: import.meta.env.PUBLIC_FINANCE_NEWS_API_KEY,
 				sort: "RELEVANCE",
 				function: "NEWS_SENTIMENT",
 				limit: 5,
 			}
 		}).then(({ data }) => {
-			const formated = mapFinanceNews(data.feed.slice(0,5));
+			const formated = mapFinanceNews(data?.feed?.slice(0,5) ?? []);
 
 			localStorage.setItem("financeNews", JSON.stringify({
 				timeStamp: Date.now(),
@@ -41,7 +42,7 @@ export const getFinanceNews = () => {
 
 export const getStocks = () => {
 	const mapStocks = (data: Stocks) => Object.values(data).map(({ symbol, name, close, percent_change }) => ({
-		name: name.replace(/\s.*/, "").toUpperCase(),
+		name: name?.replace(/\s.*/, "").toUpperCase() ?? "",
 		price: parseFloat(close),
 		symbol: symbol.replace("/USD", ""),
 		percent_change: parseFloat(percent_change)
@@ -50,7 +51,7 @@ export const getStocks = () => {
 	if (!localStorage.getItem("stocks") || DayJS().diff(JSON.parse(localStorage.getItem("stocks") as string).timeStamp as number, "minutes") >= 1) {
 		return Axios<Stocks>("https://api.twelvedata.com/quote", {
 			params: {
-				apikey: import.meta.env.VITE_FINANCE_STOCKS_API_KEY,
+				apikey: import.meta.env.PUBLIC_FINANCE_STOCKS_API_KEY,
 				symbol: [
 					[
 						"ETH/USD",

@@ -1,44 +1,7 @@
 import { For, Show, createSignal } from "solid-js";
 
 import { TbAlertTriangle } from "solid-icons/tb";
-
-const Models = [
-	{
-		model: "gemini-1.5-flash",
-		name: "Gemini 1.5 Flash",
-		experimental: false
-	},
-	{
-		model: "gemini-1.5-pro",
-		name: "Gemini 1.5 Pro",
-		experimental: false
-	},
-	// {
-	// 	model: "text-embedding-004",
-	// 	name: "Text Embedding",
-	// 	experimental: false
-	// },
-	// {
-	// 	model: "aqa",
-	// 	name: "AQA",
-	// 	experimental: false
-	// },
-	{
-		model: "gemini-exp-1121",
-		name: "Gemini 1121",
-		experimental: true
-	},
-	{
-		model: "gemini-exp-1114",
-		name: "Gemini 1114",
-		experimental: true
-	},
-	{
-		model: "gemini-1.5-flash-8b-exp-0827",
-		name: "Gemini 1.5 Flash 8B",
-		experimental: true
-	}
-];
+import { models } from "~/lib/gemini";
 
 interface SwitchModelProps {
 	light?: boolean;
@@ -50,6 +13,7 @@ const SwitchModel = ({ light, changeModel, defaultModel }: SwitchModelProps) => 
 	const [ focused, setFocused ] = createSignal<boolean>(false);
 	const [ selected, setSelected ] = createSignal<string>(defaultModel);
 
+
 	return <div style={ {
 		"border-bottom-left-radius": focused() ? "0" : "0.5rem",
 		"border-bottom-right-radius": focused() ? "0" : "0.5rem",
@@ -58,13 +22,13 @@ const SwitchModel = ({ light, changeModel, defaultModel }: SwitchModelProps) => 
 		<div class="absolute self-center flex flex-row duration-500 transition-opacity items-center gap-x-2 justify-center" style={ {
 			opacity: focused() ? 0.2 : 1
 		} }>
-			<span>{ Models.find(({ model }) => model == selected())?.name }</span>
-			<Show when={ Models.find(({ model }) => model == selected())?.experimental }>
+			<span>{ models.get(selected())?.name }</span>
+			<Show when={ models.get(selected())?.experimental }>
 				<TbAlertTriangle class="text-white" stroke-width={ 3 } />
 			</Show>
 		</div>
 		<div class="flex flex-col h-5 opacity-0">
-			<For each={ Models }>
+			<For each={ Array.from(models.values()) }>
 				{ ({ name, experimental }) =>
 					<div class="flex pointer-events-none justify-center gap-x-2 flex-row">
 						<span>{ name }</span>
@@ -76,10 +40,13 @@ const SwitchModel = ({ light, changeModel, defaultModel }: SwitchModelProps) => 
 			</For>
 		</div>
 		<div style={ {
-			height: focused() ? `${ Models.length * 2 }rem` : "0rem",
-		background: light ? "#ffffff19" : "#0000000C"
+			height: focused() ? `${ models.size * 2 }rem` : "0rem",
+			background: light ? "#ffffff19" : "#0000000C"
 		} } class="absolute top-full transition-all overflow-hidden flex flex-col duration-500 ease-in-out right-0 w-full rounded-b-lg bg-white/10 backdrop-blur-sm">
-			<For each={ Models }>
+			<For each={ Array.from(models, ([ key, values ]) => ({
+				model: key,
+				...values
+			})) }>
 				{ ({ name, experimental, model }, index) => (
 					<div onClick={ () => {
 						setSelected(model);
@@ -94,8 +61,8 @@ const SwitchModel = ({ light, changeModel, defaultModel }: SwitchModelProps) => 
 						} }>{ name }</span>
 						<Show when={ experimental }>
 							<TbAlertTriangle style={ {
-							opacity: model == selected() ? 1 : 0.6
-						} } class="text-white" stroke-width={ 3 } />
+								opacity: model == selected() ? 1 : 0.6
+							} } class="text-white" stroke-width={ 3 } />
 						</Show>
 					</div>
 				) }

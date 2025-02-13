@@ -3,11 +3,11 @@ import { BsMicrosoft, BsNvidia } from "solid-icons/bs";
 import { SiTesla } from "solid-icons/si";
 
 import { Match, Switch, type Accessor } from "solid-js";
-import BTC from "../../assets/stocks/BTC.svg";
-import DOGE from "../../assets/stocks/DOG.svg";
-import ETH from "../../assets/stocks/ETH.svg";
-import NASDAQ from "../../assets/stocks/NASDAQ.svg";
-import DOW from "../../assets/stocks/DOW.svg";
+import BTC from "../../assets/stocks/BTC.svg?url";
+import DOGE from "../../assets/stocks/DOG.svg?url";
+import ETH from "../../assets/stocks/ETH.svg?url";
+import NASDAQ from "../../assets/stocks/NASDAQ.svg?url";
+import DOW from "../../assets/stocks/DOW.svg?url";
 import { IconTypes } from "solid-icons";
 import { getStocks } from "../../lib/finance";
 import { TbBrandMeta } from "solid-icons/tb";

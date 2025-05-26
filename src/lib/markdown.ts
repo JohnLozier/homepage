@@ -1,5 +1,6 @@
+import { Marked, Token } from "marked";
+
 import { LanguageFn } from "highlight.js";
-import { Marked } from "marked";
 import bash from "highlight.js/lib/languages/bash";
 import c from "highlight.js/lib/languages/c";
 import cpp from "highlight.js/lib/languages/cpp";
@@ -39,13 +40,16 @@ hljs.registerLanguage("plaintext", plaintext);
 
 Object.keys(languages).forEach(language => hljs.registerLanguage(language, languages[language]));
 
-const ParseMarkdown = (markdown: string) =>
-	new Marked(markedHighlight({
-		langPrefix: "hljs language-",
-		highlight(code, lang) {
-			const language = hljs.getLanguage(lang) ? lang : "plaintext";
-			return hljs.highlight(code, { language }).value;
-		}
-	})).parse(markdown) as string;
+const marked = new Marked(markedHighlight({
+	langPrefix: "hljs language-",
+	highlight(code, lang) {
+		const language = hljs.getLanguage(lang) ? lang : "plaintext";
+		return hljs.highlight(code, { language }).value;
+	}
+}));
 
-export default ParseMarkdown;
+export const parseTokens = (token: Token) =>
+	marked.parse(token.raw) as string;
+
+export const parse = (markdown: string) =>
+	marked.parse(markdown) as string;

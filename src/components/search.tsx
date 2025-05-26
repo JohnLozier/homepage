@@ -1,5 +1,5 @@
 import { For, createSignal, onMount } from "solid-js";
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, StartChatParams } from "@google/generative-ai";
+import { HarmBlockThreshold, HarmCategory } from "@google/genai";
 
 import { FiRefreshCcw } from "solid-icons/fi";
 import { FiSearch } from "solid-icons/fi";
@@ -8,33 +8,33 @@ import Icon from "./icon";
 import { light } from "~/lib/background";
 import { shown } from "~/lib/show";
 
-const model = new GoogleGenerativeAI(import.meta.env.PUBLIC_GEMINI_API_KEY).getGenerativeModel({
-	model: "gemini-2.0-flash",
-});
+// const model = new GoogleGenerativeAI(import.meta.env.PUBLIC_GEMINI_API_KEY).getGenerativeModel({
+// 	model: "gemini-2.0-flash",
+// });
 
-const chatConfig: StartChatParams = {
-	safetySettings: [{
-		category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-		threshold: HarmBlockThreshold.BLOCK_NONE
-	},
-	{
-		category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-		threshold: HarmBlockThreshold.BLOCK_NONE
-	},
-	{
-		category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-		threshold: HarmBlockThreshold.BLOCK_NONE
-	},
-	{
-		category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-		threshold: HarmBlockThreshold.BLOCK_NONE
-	},
-	{
-		category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-		threshold: HarmBlockThreshold.BLOCK_NONE
-	}],
-	history: []
-};
+// const chatConfig: StartChatParams = {
+// 	safetySettings: [{
+// 		category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+// 		threshold: HarmBlockThreshold.BLOCK_NONE
+// 	},
+// 	{
+// 		category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+// 		threshold: HarmBlockThreshold.BLOCK_NONE
+// 	},
+// 	{
+// 		category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+// 		threshold: HarmBlockThreshold.BLOCK_NONE
+// 	},
+// 	{
+// 		category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+// 		threshold: HarmBlockThreshold.BLOCK_NONE
+// 	},
+// 	{
+// 		category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+// 		threshold: HarmBlockThreshold.BLOCK_NONE
+// 	}],
+// 	history: []
+// };
 
 const Search = () => {
 	let input: HTMLInputElement;
@@ -56,9 +56,9 @@ const Search = () => {
 	const sendGeminiMessage = async () => {
 		setGeminiResponse("")
 		try {
-			await model.startChat(chatConfig)
-				.sendMessage(`Return a short and to the point response without markdown to answer the following question. ${ input!.value }`)
-				.then(({ response }) => setGeminiResponse(response.text()));
+			// await model.startChat(chatConfig)
+			// 	.sendMessage(`Return a short and to the point response without markdown to answer the following question. ${ input!.value }`)
+			// 	.then(({ response }) => setGeminiResponse(response.text()));
 		} catch {
 			setGeminiResponse("I'm sorry, Something went wrong. Please try again later.");
 		};

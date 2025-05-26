@@ -1,18 +1,14 @@
-import { For, Show, createSignal } from "solid-js";
+import { Accessor, For, Setter, Show, createSignal } from "solid-js";
 
 import { TbAlertTriangle } from "solid-icons/tb";
-import { models } from "~/lib/gemini";
+import { models } from "~/lib/models";
 
-interface SwitchModelProps {
+const SwitchModel = ({ light, model, setModel }: {
 	light?: boolean;
-	defaultModel: string;
-	changeModel: (model: string) => void;
-};
-
-const SwitchModel = ({ light, changeModel, defaultModel }: SwitchModelProps) => {
+	model: Accessor<string>;
+	setModel: Setter<string>;
+}) => {
 	const [ focused, setFocused ] = createSignal<boolean>(false);
-	const [ selected, setSelected ] = createSignal<string>(defaultModel);
-
 
 	return <div style={ {
 		"border-bottom-left-radius": focused() ? "0" : "0.5rem",
@@ -22,8 +18,8 @@ const SwitchModel = ({ light, changeModel, defaultModel }: SwitchModelProps) => 
 		<div class="absolute self-center flex flex-row duration-500 transition-opacity items-center gap-x-2 justify-center" style={ {
 			opacity: focused() ? 0.2 : 1
 		} }>
-			<span>{ models.get(selected())?.name }</span>
-			<Show when={ models.get(selected())?.experimental }>
+			<span>{ models.get(model())?.name }</span>
+			<Show when={ models.get(model())?.experimental }>
 				<TbAlertTriangle class="text-white" stroke-width={ 3 } />
 			</Show>
 		</div>
@@ -47,21 +43,19 @@ const SwitchModel = ({ light, changeModel, defaultModel }: SwitchModelProps) => 
 				model: key,
 				...values
 			})) }>
-				{ ({ name, experimental, model }, index) => (
+				{ ({ name, experimental, model: identifier }, index) => (
 					<div onClick={ () => {
-						setSelected(model);
-						changeModel(model);
-						localStorage.setItem("model", model);
+						setModel(identifier);
 					} } style={ {
 						display: focused() ? "flex" : "none",
 						"animation-delay": `${ index() * 100 }ms`
 					} } class="flex animate-fadeIn justify-center [animation-duration:500ms] gap-x-2 opacity-0 items-center w-full flex-row hover:bg-black/10 py-2">
 						<span style={ {
-							opacity: model == selected() ? 1 : 0.6
+							opacity: identifier == model() ? 1 : 0.6
 						} }>{ name }</span>
 						<Show when={ experimental }>
 							<TbAlertTriangle style={ {
-								opacity: model == selected() ? 1 : 0.6
+								opacity: identifier == model() ? 1 : 0.6
 							} } class="text-white" stroke-width={ 3 } />
 						</Show>
 					</div>
@@ -71,4 +65,4 @@ const SwitchModel = ({ light, changeModel, defaultModel }: SwitchModelProps) => 
 	</div>;
 };
 
-export default   SwitchModel;
+export default SwitchModel;

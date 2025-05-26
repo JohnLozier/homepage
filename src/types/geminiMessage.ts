@@ -1,4 +1,19 @@
 export type MessageType = {
 	from: "user" | "model";
-	message: string;
+	text: string;
+	grounding?: {
+		title: string;
+		url: string;
+	}[];
+	searches?: string[];
+	thinking?: string;
+	toolCalls?: string[];
+};
+
+export interface MessageError {
+	error: {
+		message: string;
+		code: number;
+		status: string;
+	};
 };

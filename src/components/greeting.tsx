@@ -1,43 +1,43 @@
 import { BACKUP_GREETING, PROMPT } from "../../env";
 import { For, createResource, onMount } from "solid-js";
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory }from "@google/generative-ai";
+import { HarmBlockThreshold, HarmCategory }from "@google/genai";
 import { backgroundPattern, light } from "~/lib/background";
 
 import DayJS from "dayjs";
 import { cn } from "~/lib/utils";
 import { shown } from "~/lib/show";
 
-const model = new GoogleGenerativeAI(import.meta.env.PUBLIC_GEMINI_API_KEY).getGenerativeModel({
-	model: "gemini-2.0-flash-lite-preview-02-05",
-	systemInstruction: {
-		text: PROMPT
-	},
-	generationConfig: {
-		temperature: 0.1, // 0.4
-		topP: 0.9,
-		responseMimeType: "text/plain"
-	},
-	safetySettings: [{
-		category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-		threshold: HarmBlockThreshold.BLOCK_NONE
-	},
-	{
-		category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-		threshold: HarmBlockThreshold.BLOCK_NONE
-	},
-	{
-		category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-		threshold: HarmBlockThreshold.BLOCK_NONE
-	},
-	{
-		category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-		threshold: HarmBlockThreshold.BLOCK_NONE
-	},
-	{
-		category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-		threshold: HarmBlockThreshold.BLOCK_NONE
-	}]
-});
+// const model = new GoogleGenerativeAI(import.meta.env.PUBLIC_GEMINI_API_KEY).getGenerativeModel({
+// 	model: "gemini-2.0-flash-lite-preview-02-05",
+// 	systemInstruction: {
+// 		text: PROMPT
+// 	},
+// 	generationConfig: {
+// 		temperature: 0.1, // 0.4
+// 		topP: 0.9,
+// 		responseMimeType: "text/plain"
+// 	},
+// 	safetySettings: [{
+// 		category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+// 		threshold: HarmBlockThreshold.BLOCK_NONE
+// 	},
+// 	{
+// 		category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+// 		threshold: HarmBlockThreshold.BLOCK_NONE
+// 	},
+// 	{
+// 		category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+// 		threshold: HarmBlockThreshold.BLOCK_NONE
+// 	},
+// 	{
+// 		category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+// 		threshold: HarmBlockThreshold.BLOCK_NONE
+// 	},
+// 	{
+// 		category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+// 		threshold: HarmBlockThreshold.BLOCK_NONE
+// 	}]
+// });
 
 const greetings: Record<string, string> = {
 	0: "Good night",
@@ -52,6 +52,8 @@ const greetings: Record<string, string> = {
 
 const Greeting = () => {
 	const [ data, { refetch } ] = createResource(async () => {
+
+		return "";
 		return await model.generateContent([
 			{
 				text: `Here is a list of some live soccer scores: ${ JSON.parse(localStorage.getItem("news") as string)?.map?.(({ teams, time, league }: {

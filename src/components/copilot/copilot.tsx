@@ -6,23 +6,23 @@ import { shown } from "~/lib/show";
 
 const Copilot = () => {
 
-	const [ showSidebar, setShowSidebar ] = createSignal(false);
+	const [ open, setOpen ] = createSignal(false);
 
 	onMount(() =>
 		document.addEventListener("keydown", (event) =>
 			!["input", "textarea"].includes((event.target as HTMLElement).localName) && event.key == "c" && !event.ctrlKey ?
-				[setShowSidebar(current => !current), event.preventDefault()] :
-				event.key == "Escape" && setShowSidebar(false)
+				[setOpen(current => !current), event.preventDefault()] :
+				event.key == "Escape" && setOpen(false)
 		)
 	);
 
 	createEffect(() =>
-		!showSidebar() && document.documentElement.focus()
+		!open() && document.documentElement.focus()
 	);
 
 	return <Show when={ shown() }>
-		<Icon setShowSidebar={ setShowSidebar } showSidebar={ showSidebar } />
-		<Sidebar setShowSidebar={ setShowSidebar } showSidebar={ showSidebar } />
+		<Icon setOpen={ setOpen } open={ open } />
+		<Sidebar setOpen={ setOpen } open={ open } />
 	</Show>;
 };
 

@@ -22,7 +22,7 @@ const Lozier = () => {
 			setBackgroundPattern(current =>
 				shiftKey ? current : backgroundOptions[(backgroundOptions.indexOf(current) + 1) % backgroundOptions.length]
 			)
-		} src={ LozierSVG } class="cursor-pointer hover:[scale:1.10] duration-300 animate-spin hover:[animation-play-state:running] [animation-play-state:paused] [animation-duration:1s] transition-[scale] w-12 h-12" />
+		} src={ "." + LozierSVG } class="cursor-pointer hover:[scale:1.10] duration-300 animate-spin hover:[animation-play-state:running] [animation-play-state:paused] [animation-duration:1s] transition-[scale] w-12 h-12" />
 	</div>;
 };
 

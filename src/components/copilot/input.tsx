@@ -1,21 +1,20 @@
-import { createEffect, createSignal, type Accessor, type Setter } from "solid-js";
+import { createEffect, createSignal, Resource, Setter, Show, type Accessor } from "solid-js";
 
-import type { ChatSession } from "@google/generative-ai";
 import { FiSend } from "solid-icons/fi";
-import { MessageType } from "../../types/geminiMessage";
-import parseMarkdown from "../../lib/parseMarkdown";
+import { Chat, Type } from "@google/genai";
+import { MessageError, MessageType } from "~/types/geminiMessage";
 
-const Input = (props: {
-	setConversation: Setter<MessageType[]>;
-	conversation: Accessor<MessageType[]>;
-	abortSignal: AbortSignal;
-	showSidebar?: Accessor<boolean>;
+const Input = ({ abort, setLiveMessage, isOpen, pushHistory, chat, messageContainer }: {
+	abort: AbortController;
 	messageContainer: HTMLDivElement;
-	geminiContainer: HTMLDivElement;
-	Gemini: () => ChatSession;
+	isOpen: Accessor<boolean>;
+	setLiveMessage: Setter<{
+		active: boolean;
+	} & Omit<MessageType, "from">>;
+	pushHistory: (message: MessageType) => void;
+	chat: Resource<Chat>;
 }) => {
-
-	const [ locked, setLocked ] = createSignal(false);
+	const [ streaming, setStreaming ] = createSignal(false);
 	const [ isEmpty, setIsEmpty ] = createSignal(true);
 
 	let input: HTMLTextAreaElement;
@@ -27,88 +26,236 @@ const Input = (props: {
 	};
 
 	createEffect(() =>
-		(props.showSidebar?.() ?? true) && input!.focus()
+		isOpen?.() && input!.focus()
 	);
 
 	const sendMessage = async () => {
-		setLocked(true);
+		setStreaming(true);
 
 		const text = input!.value;
 
 		input!.value = "";
 		input!.style.height = "3rem";
 
-		const isAtBottom = Math.abs(props.messageContainer.scrollHeight - props.messageContainer.scrollTop - props.messageContainer.clientHeight) < 50;
+		const isAtBottom = Math.abs(messageContainer.scrollHeight - messageContainer.scrollTop - messageContainer.clientHeight) < 50;
 
-		props.setConversation(current => [ ...current, {
-			from: "user" as const,
-			message: text
-		}]);
+		pushHistory({
+			from: "user",
+			text: text
+		});
 
-		isAtBottom && props.messageContainer.scroll({
-			top: props.messageContainer.scrollHeight,
+		isAtBottom && messageContainer.scroll({
+			top: messageContainer.scrollHeight,
 			behavior: "smooth"
 		});
 
-		let geminiResponseText = "";
-
 		try {
-			const geminiResponse = await props.Gemini().sendMessageStream(text, {
-				signal: props.abortSignal
+			const stream = await chat()!.sendMessageStream({
+				message: text,
+				config: {
+					abortSignal: abort.signal,
+					thinkingConfig: {
+						includeThoughts: true
+					},
+					toolConfig: {
+						// functionCallingConfig: {
+						// 	allowedFunctionNames: [
+						// 		"openSources",
+						// 		"copy",
+						// 		"createDraftEmail"
+						// 	]
+						// },
+						// retrievalConfig: {
+						// 	latLng: {
+
+						// 	}
+						// }
+					},
+					tools: [
+						{
+							// codeExecution: {},
+							googleSearch: {},
+							// functionDeclarations: [
+							// 	{
+							// 		name: "openSources",
+							// 		description: "Opens new tabs to documentation, searches or other relevant information to help answer the users questions and give them more details",
+							// 		parameters: {
+							// 			type: Type.OBJECT,
+							// 			properties: {
+							// 				urls: {
+							// 					type: Type.ARRAY,
+							// 					items: {
+							// 						type: Type.STRING,
+							// 						pattern: "^https?:\\/\\/.+$"
+							// 					},
+							// 					maxItems: "5"
+							// 				}
+							// 			}
+							// 		}
+							// 	}, {
+							// 		name: "copy",
+							// 		description: "If code then copies each code block to the clipboard in the order of most to least useful. Don't combine different areas of code or files. If not code then copies a single answer or most useful peice of content",
+							// 		parameters: {
+							// 			type: Type.OBJECT,
+							// 			properties: {
+							// 				content: {
+							// 					type: Type.ARRAY,
+							// 					items: {
+							// 						type: Type.STRING,
+							// 						description: "Single code block with just the code or the answer or most useful peice of content"
+							// 					},
+							// 					maxItems: "7"
+							// 				}
+							// 			}
+							// 		}
+							// 	}, {
+							// 		name: "createDraftEmail",
+							// 		description: "Creates a new draft email with a body and subject",
+							// 		parameters: {
+							// 			type: Type.OBJECT,
+							// 			properties: {
+							// 				body: {
+							// 					type: Type.STRING,
+							// 					description: "The body for the email"
+							// 				},
+							// 				subject: {
+							// 					type: Type.STRING,
+							// 					description: "The subject of the email"
+							// 				}
+							// 			}
+							// 		}
+							// 	}
+							// ]
+						}
+					]
+				}
 			});
 
-			for await (const message of geminiResponse.stream) {
-				geminiResponseText += message.text();
-				const isAtBottom = Math.abs(props.messageContainer.scrollHeight - props.messageContainer.scrollTop - props.messageContainer.clientHeight) < 50;
+			let message = {
+				text: "",
+				thinking: "",
+				toolCalls: [],
+				grounding: [] as {
+					title: string;
+					url: string;
+				}[],
+				searches: [] as string[]
+			};
 
-				props.geminiContainer.innerHTML = parseMarkdown(geminiResponseText);
+			setLiveMessage({
+				...message,
+				active: true
+			});
 
-				isAtBottom && props.messageContainer.scroll({
-					top: props.messageContainer.scrollHeight,
+			for await (const response of stream) {
+				const candidate = response.candidates?.[0];
+
+				if (!candidate) {
+					continue;
+				};
+
+				const isAtBottom = Math.abs(messageContainer.scrollHeight - messageContainer.scrollTop - messageContainer.clientHeight) < 50;
+
+				message = setLiveMessage(live => ({
+					active: live.active,
+					text: live.text + (response.text ?? ""),
+					grounding: [ ...message.grounding, ...(candidate?.groundingMetadata?.groundingChunks?.flatMap(({ web }) => web?.title && web?.uri ? ({
+						title: web.title,
+						url: web.uri
+					}) : []) ?? []) ],
+					searches: [ ...message.searches, ...(candidate?.groundingMetadata?.webSearchQueries ?? []) ],
+					thinking: live.thinking + (candidate.content?.parts?.reduce((prev, { thought, text }) =>
+						prev + (thought ? (text ?? "") : ""),
+					"") ?? ""),
+					toolCalls: []
+				}));
+
+				isAtBottom && messageContainer.scroll({
+					top: messageContainer.scrollHeight,
 					behavior: "smooth"
 				});
 			};
 
-			props.setConversation(current => {
-				if (current.length % 2 == 0) {
-					localStorage.setItem("copilotHistory", JSON.stringify([ ...current, {
-						from: "model" as const,
-						message: geminiResponseText
-					}]));
-
-					props.geminiContainer.innerHTML = "";
-
-					return [ ...current, {
-						from: "model" as const,
-						message: geminiResponseText
-					}];
-				} else {
-					return current;
-				}
+			pushHistory({
+				from: "model",
+				...message
 			});
-		} catch (error) {
+
+			message = setLiveMessage({
+				active: false,
+				text: "",
+				thinking: "",
+				grounding: [],
+				searches: [],
+				toolCalls: []
+			});
+		} catch (error: any) {
 			console.error(error);
 
-			geminiResponseText = "I'm sorry, Something went wrong. Please try again later.";
+			setLiveMessage({
+				active: false,
+				text: "",
+				thinking: "",
+				grounding: [],
+				searches: [],
+				toolCalls: []
+			});
+
+			try {
+				const parsedError = JSON.parse(error.message.replace(/^got status: \d\d\d \. /, "")) as MessageError;
+
+				const { error: { message: errorMessage } } = JSON.parse(parsedError.error.message) as MessageError;
+
+				pushHistory({
+					from: "model",
+					text: errorMessage
+				});
+			} catch {
+				pushHistory({
+					from: "model",
+					text: "Sorry, something went wrong while generating your response. Please try again."
+				});
+			}
 		};
 
-		setLocked(false);
+		setStreaming(false);
 	};
 
-	return <div class="m-3 items-center p-3 gap-x-2 flex flex-row bg-black/10 rounded-lg">
+	return <div class="m-3 mt-0 items-center p-3 gap-x-2 flex flex-row bg-black/10 rounded-lg">
 		<textarea ref={ input! } onKeyUp={ ({ key, shiftKey, target }) =>
-			key == "Enter" && !shiftKey && !locked() && (target as HTMLTextAreaElement).value.match(/\S/)?.[0] && sendMessage()
+			key == "Enter" && !shiftKey && !streaming() && (target as HTMLTextAreaElement).value.match(/\S/)?.[0] && sendMessage()
 		} onKeyDown={ (e) =>
-			e.key == "Enter" && !e.shiftKey && !locked() && (e.target as HTMLTextAreaElement).value.match(/\S/)?.[0] ?
+			e.key == "Enter" && !e.shiftKey && !streaming() && (e.target as HTMLTextAreaElement).value.match(/\S/)?.[0] ?
 				e.preventDefault()
 				: onInput()
 		} onInput={ ({ inputType }) =>
 			inputType != "insertText" && onInput()
 		} class="flex-1 resize-none text-base outline-none bg-transparent h-12 text-white/70 caret-white/70 font-mona" />
-		<FiSend style={ locked() || isEmpty() ? {
-			opacity: 0.5,
-			"pointer-events": "none"
-		} : {} } onClick={ sendMessage } stroke-width={ 2 } class="w-6 h-6 transition-[transform] duration-200 hover:scale-110 cursor-pointer text-white/70" />
+		<Show when={ !streaming() } fallback={
+			<div onClick={ () => {
+				abort.abort();
+
+				const message = setLiveMessage({
+					active: false,
+					text: "",
+					grounding: [],
+					searches: [],
+					toolCalls: []
+				});
+
+				setStreaming(false);
+
+				pushHistory({
+					from: "model",
+					...message
+				});
+			} } class="size-3.5 transition-[scale] duration-200 hover:scale-110 animate-fadeIn cursor-pointer bg-white/50 rounded-xs" />
+		}>
+			<FiSend style={ isEmpty() ? {
+				opacity: 0.5,
+				"pointer-events": "none"
+			} : {} } onClick={ sendMessage } stroke-width={ 2 } class="size-6 transition-[scale] duration-200 hover:scale-110 animate-fadeIn cursor-pointer text-white/70" />
+		</Show>
 	</div>
 };
 

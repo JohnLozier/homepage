@@ -28,3 +28,21 @@ export interface News {
 	"ai_region": "ONLY AVAILABLE IN CORPORATE PLANS",
 	"ai_org": "ONLY AVAILABLE IN CORPORATE PLANS"
 };
+
+export interface HackerNewsHit {
+	title: string
+	url: string | null
+	author: string
+	created_at: string
+	points: number
+	objectID: string
+};
+
+export interface HackerNews {
+	title: string
+	url: string
+	author: string
+	date: string
+	points: number
+	image?: string
+};

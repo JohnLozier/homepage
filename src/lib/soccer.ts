@@ -104,12 +104,12 @@ export const getMatches = () => {
 
 export const getSoccerNews = () => {
 	if (!localStorage.getItem("soccerNews") || DayJS().diff(JSON.parse(localStorage.getItem("soccerNews") as string).timeStamp as number, "hours") >= 1) {
-		return Axios<SoccerNews[]>("https://football-news-aggregator-live.p.rapidapi.com/news/espn", {
+		return Axios<{ data: SoccerNews[] }>("https://football-news-aggregator-live.p.rapidapi.com/news/goal", {
 			"headers": {
 				"x-rapidapi-key": import.meta.env.PUBLIC_FOOTBALL_AGGREGATOR_API_KEY,
 				"x-rapidapi-host": "football-news-aggregator-live.p.rapidapi.com"
 			}
-		}).then(({ data }) => {
+		}).then(({ data: { data } }) => {
 			const removedDuplicates = data.slice(0, 5).reduce((prev: SoccerNews[], current) => prev.findIndex(e => e.title == current.title) < 0 ? [ ...prev, current ] : prev, []);
 
 			localStorage.setItem("soccerNews", JSON.stringify({
@@ -123,16 +123,3 @@ export const getSoccerNews = () => {
 
 	return JSON.parse(localStorage.getItem("soccerNews") as string)?.data as SoccerNews[];
 };
-
-// const urlLastFiveGames =
-//     "https://football-highlights-api.p.rapidapi.com/highlights?limit=5&countryCode=US";
-
-//   const options = {
-//     method: "GET",
-//     headers: {
-//       "x-rapidapi-key": "854d52dfc6mshd9f4f8c27dcbbe9p18486fjsn64fe1a60f11d",
-//       "x-rapidapi-host": "football-highlights-api.p.rapidapi.com",
-//     },
-//   };
-
-// fetch(urlLastFiveGames, options)

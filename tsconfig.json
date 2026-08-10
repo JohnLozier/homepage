@@ -12,8 +12,13 @@
 		"verbatimModuleSyntax": null,
 		"isolatedModules": true,
 		"paths": {
-			"~/*": ["./src/*"]
+			"~/*": ["./src/*"],
+			"markdown-it-katex": ["./src/types/markdown-it-katex.d.ts"]
 		},
+		"typeRoots": [
+			"./node_modules/@types",
+			"./src/types"
+		],
 		"baseUrl": "."
 	}
 }

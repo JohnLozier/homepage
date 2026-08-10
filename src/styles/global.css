@@ -63,7 +63,6 @@
 	--font-mona: "Mona-Sans";
 
 	--animate-fadeIn: fadeIn 1s ease-out forwards;
-	--animate-up: up 1s ease-out;
 	--animate-grow: grow 0.7s ease-out;
 
 	@keyframes fadeIn {
@@ -74,15 +73,6 @@
 		100% {
 			opacity: 1;
 			filter: blur(0);
-		}
-	}
-
-	@keyframes up {
-		0% {
-			transform: translateY(3rem);
-		}
-		100% {
-			transform: translateY(0rem);
 		}
 	}
 

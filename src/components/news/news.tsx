@@ -1,10 +1,10 @@
 import { For, createEffect, createResource, createSignal, onMount } from "solid-js";
+import { getHackerNews, getNews } from "../../lib/news";
 
 import Article from "./article";
 import ESPN from "../../assets/espn.svg?url";
 import { getFinanceNews } from "../../lib/finance";
 import { getHighlights } from "../../lib/highlights";
-import { getNews } from "../../lib/news";
 import { getSoccerNews } from "../../lib/soccer";
 import { shown } from "~/lib/show";
 
@@ -39,10 +39,9 @@ const News = () => {
 
 	const [ SoccerNews, { refetch: refetchSoccer } ] = createResource(async () => (await getSoccerNews())?.map(news => ({
 		content: news.title,
-		img: news.img,
+		img: news.image,
 		link: news.url,
-		author: "ESPN",
-		authorImg: ESPN
+		author: "Goal"
 	})).sort( () => 0.5 - Math.random()), {
 		initialValue: [],
 		ssrLoadFrom: "initial"
@@ -72,6 +71,17 @@ const News = () => {
 		ssrLoadFrom: "initial"
 	});
 
+	const [ HackerNews, { refetch: refetchHackerNews } ] = createResource(async () => (await getHackerNews())?.map(news => ({
+		content: news.title,
+		img: news.image,
+		link: news.url,
+		author: "Hacker News",
+		date: news.date
+	})).sort( () => 0.5 - Math.random()), {
+		initialValue: [],
+		ssrLoadFrom: "initial"
+	});
+
 	newsList().length == 0 && createEffect(() =>
 		setNewsList(current => [...current, ...(SoccerNews() ?? [])])
 	);
@@ -88,8 +98,13 @@ const News = () => {
 		setNewsList(current => [...current, ...(Highlights() ?? [])])
 	);
 
+	newsList().length == 0 && createEffect(() =>
+		setNewsList(current => [...current, ...(HackerNews() ?? [])])
+	);
+
 	onMount(() => {
 		refetchSoccer();
+		refetchHackerNews();
 		refetchNews();
 		refetchFinance();
 		refetchHighlights();

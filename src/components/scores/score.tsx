@@ -31,7 +31,7 @@ const Score = ({
 
 	return <div style={ {
 		"cursor": index() < shown() || shown() == -1 ? undefined : "default",
-	} } class="flex w-[32rem] relative flex-col">
+	} } class="flex relative flex-col">
 		{ INITIAL_SHOWN - 1 == index() && length > INITIAL_SHOWN &&
 			<div style={ {
 				display: shown() == -1 ? "none" : undefined,
@@ -54,7 +54,7 @@ const Score = ({
 			"transition-delay": index() < shown() || shown() == -1 ? (index() - INITIAL_SHOWN + 1) * 200 + "ms" : (shown() - INITIAL_SHOWN + 1) * 200 - (index() - INITIAL_SHOWN + 1) * 200 + "ms",
 			"animation": index() < INITIAL_SHOWN ? `fadeIn 1s ease-out ${ (index() + 1) * 500 }ms forwards` : undefined
 		} } class="font-montserrat transition-[filter,opacity] duration-500 text-white/80 font-semibold grid grid-cols-[1fr_auto_1fr] w-full gap-x-2">
-			<div class="flex items-center gap-x-2 flex-rown overflow-hidden">
+			<div class="flex items-center gap-x-2 flex-row overflow-hidden">
 				<img draggable="false" style={ {
 					opacity: homeIcon() ? 1 : 0,
 					filter:  homeIcon() ? "blur(0px)" : "blur(5px)"
@@ -62,13 +62,13 @@ const Score = ({
 				<span class="text-ellipsis overflow-hidden text-nowrap">{ match.teams.home.name }</span>
 			</div>
 			<span class="flex flex-row items-center gap-x-2 w-min col-auto">
-				<span class="text-white font-bold text-lg">{ match.teams.home.goals }</span>
+				<span class="text-white font-bold text-lg mr-4">{ match.teams.home.goals }</span>
 				-
 				<span class="text-white/80 font-bold text-xl">{ match.time }'</span>
 				-
-				<span class="text-white font-bold text-lg">{ match.teams.away.goals }</span>
+				<span class="text-white font-bold text-lg ml-4">{ match.teams.away.goals }</span>
 			</span>
-			<div class="flex items-center gap-x-2 justify-end flex-rown overflow-hidden">
+			<div class="flex items-center gap-x-2 justify-end flex-row overflow-hidden">
 				<span class="text-ellipsis overflow-hidden text-nowrap">{ match.teams.away.name }</span>
 				<img style={ {
 					opacity: awayIcon() ? 1 : 0,

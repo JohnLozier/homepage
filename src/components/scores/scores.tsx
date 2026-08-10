@@ -21,7 +21,7 @@ const Scores = () => {
 
 	return <div style={ {
 		display: shown() ? undefined : "none"
-	} } class="absolute left-10 bottom-5 inset-y-5 flex justify-end items-center flex-col gap-y-1">
+	} } class="absolute left-5 bottom-5 inset-y-5 flex justify-end items-center flex-col gap-y-1">
 		<div ref={ container! } onClick={ ({ target }) => {
 			target.scrollTo({
 				top: 0,

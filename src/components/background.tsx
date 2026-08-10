@@ -1,12 +1,13 @@
 import { Match, Switch, createEffect, createResource, createSignal, on, onCleanup } from "solid-js";
 import { backgroundOptions, backgroundPattern, setBackgroundPattern } from "~/lib/background";
-import { get, set } from "../lib/indexDB";
+import { create, get, update } from "../lib/db";
 
 import Axios from "axios";
 import type { Random } from "unsplash-js/dist/methods/photos/types";
 import { YOUTUBE_URLS } from "../../env";
 import { YouTubePlayer } from "youtube-player/dist/types";
 import Youtube from "youtube-player";
+import { awaitMount } from "~/lib/utils";
 import { createApi } from "unsplash-js";
 
 const Unsplash = createApi({
@@ -25,12 +26,19 @@ const Background = () => {
 		(rand + 150) % 360
 	]);
 
+	const db = awaitMount(() => create<Blob, "images">({
+		name: "unsplash",
+		stores: [
+			{ name: "images", keyPath: "id" }
+		]
+	}));
+
 	const [ image, { refetch } ] = createResource(backgroundPattern, async type => {
 		if (type != "image") {
 			return undefined;
 		};
 
-		const blob = await get<Blob>("unsplash", "images", "image");
+		const { blob } = await get(await db, "images", "image") ?? {} as { id: string, blob: Blob };
 
 		return blob ? URL.createObjectURL(blob) : ((await Unsplash.photos.getRandom({
 			collectionIds: [ "U4hZz7KKhQU" ]
@@ -138,11 +146,11 @@ const Background = () => {
 					collectionIds: [ "U4hZz7KKhQU" ]
 				});
 
-				const { data } = await Axios((unsplash.response as Random).urls.full + "&h=1440", {
+				const { data } = await Axios<Blob>((unsplash.response as Random).urls.full + "&h=1440", {
 					responseType: "blob"
 				});
 
-				set("unsplash", "images", "image", await data);
+				update(await db, "images", { id: "image", blob: data });
 
 			} } class="w-full h-full select-none object-cover transition-[opacity,filter] opacity-1 blur-sm duration-1000" src={ image() } />
 		</Match>

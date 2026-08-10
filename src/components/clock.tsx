@@ -9,10 +9,10 @@ function Clock() {
 	});
 
 	const hour = createMemo(() =>
-		DayJS(time()).format("h:mm").replace(/:(\d)$/, ":0$1")
+		time() ? DayJS(time()).format("h:mm").replace(/:(\d)$/, ":0$1") : ""
 	);
 	const date = createMemo(() =>
-		DayJS(time()).format("MMM D, YYYY")
+		time() ? DayJS(time()).format("MMM D, YYYY") : ""
 	);
 
 	onMount(() => {

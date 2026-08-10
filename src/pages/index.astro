@@ -3,7 +3,6 @@
 import "~/styles/global.css";
 
 import Clock from "~/components/clock";
-import Copilot from "~/components/copilot/copilot";
 import Greeting from "~/components/greeting";
 import Background from "~/components/background";
 import News from "~/components/news/news";
@@ -33,10 +32,9 @@ import Weather from "~/components/weather";
 				<Weather client:load />
 			</div>
 		</div>
-		<Copilot client:idle />
 		<Greeting client:load />
-		<div class="absolute flex-col flex items-center focus-within:h-[max(calc(33.3333%+8rem),35rem)] transition-[top,height] duration-500 justify-stretch gap-y-3 w-1/3 h-[max(33.3333%,27rem)] bottom-0 min-w-[50rem] ml-[50%] -translate-x-1/2">
-			<Search client:load />
+		<div class="absolute flex-col flex items-center focus-within:h-[max(calc(33.3333%+8rem),35rem)] transition-[top,height] duration-500 justify-stretch gap-y-3 w-1/3 hover:h-[max(33.3333%,27rem)] h-[max(20.3333%,5rem)] bottom-0 min-w-[50rem] ml-[50%] -translate-x-1/2">
+			<!-- <Search client:load /> -->
 			<News client:idle />
 		</div>
 		<Scores client:load />

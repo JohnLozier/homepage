@@ -76,6 +76,15 @@
 		}
 	}
 
+	@keyframes up {
+		0% {
+			transform: translateY(0.75rem);
+		}
+		100% {
+			transform: translateY(0);
+		}
+	}
+
 	@keyframes grow {
 		0% {
 			width: 0;

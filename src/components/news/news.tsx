@@ -115,7 +115,7 @@ const News = () => {
 	return <div ref={ container! } style={ {
 		display: shown() ? undefined : "none"
 	} } class="[scrollbar-width:none] w-full pb-5 flex-1 overflow-y-scroll">
-		<div class="mt-2 grid-cols-3 grid items-center overflow-hidden gap-5 ">
+		<div class="mt-2 grid grid-cols-3 items-stretch gap-4">
 			<For each={ newsList() }>
 				{ (news, index) =>
 					<Article
